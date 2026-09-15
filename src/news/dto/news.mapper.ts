@@ -1,7 +1,9 @@
+import { Injectable } from '@nestjs/common';
 import { News } from '../news.entity.js';
 import { NewsDto } from './news.dto.js';
 import { NewsSaveDto } from './news.save-dto.js';
 
+@Injectable()
 export class NewsMapper {
   constructor(
     private readonly newsMapper: NewsMapper
