@@ -7,10 +7,20 @@ import { ScheduleModule } from './schedule/sсhedules.module.js';
 import { BookingsModule } from './booking/bookings.module.js';
 import { PaymentModule } from './payment/payments.module.js';
 import { NewsModule } from './news/news.module.js';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 
 @Module({
-  imports: [UsersModule,ServicesModule,MembershipModule,UserMembershipsModule,ScheduleModule, BookingsModule, PaymentModule, NewsModule],
+  imports: [UsersModule,ServicesModule,MembershipModule,UserMembershipsModule,ScheduleModule, BookingsModule, PaymentModule, NewsModule, TypeOrmModule.forRoot({
+      type: 'postgres',
+      host: 'localhost',
+      port: 5432,
+      username: 'postgres',
+      password: 'qwerty123',
+      database: 'sport-club',
+      autoLoadEntities: true,
+      synchronize: true,
+    }),],
   controllers: [],
   providers: [],
 })
