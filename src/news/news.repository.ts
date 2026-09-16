@@ -13,4 +13,8 @@ export class NewsRepository {
   async save(news: News): Promise<News> {
     return this.repository.create(news)
   }
+
+  async findAll(): Promise<News[]> {
+    return this.repository.find({});
+  }
 }

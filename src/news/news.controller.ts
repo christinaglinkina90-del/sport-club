@@ -1,4 +1,4 @@
-import { Controller, Post } from '@nestjs/common';
+import { Controller, Get, Post } from '@nestjs/common';
 import { NewsService } from './news.service.js';
 import { NewsSaveDto } from './dto/news.save-dto.js';
 import { NewsDto } from './dto/news.dto.js';
@@ -10,5 +10,10 @@ export class NewsController {
   @Post('news')
   async create(newsSaveDto: NewsSaveDto): Promise<NewsDto> {
     return await this.newsService.create(newsSaveDto);
+  }
+
+  @Get('news')
+  async getAll(): Promise<NewsDto[]> {
+    return this.newsService.getAllNews();
   }
 }
