@@ -5,9 +5,6 @@ import { NewsSaveDto } from './news.save-dto.js';
 
 @Injectable()
 export class NewsMapper {
-  constructor(
-    private readonly newsMapper: NewsMapper
-  ) { }
 
   mapDtoToEntity(saveDto: NewsSaveDto): News {
     const entity: News = new News();
