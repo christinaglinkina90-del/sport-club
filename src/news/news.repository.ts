@@ -1,9 +1,7 @@
 import { Injectable } from '@nestjs/common';
-import { NewsDto } from './dto/news.dto.js';
 import { Repository } from 'typeorm';
 import { News } from './news.entity.js';
 import { InjectRepository } from '@nestjs/typeorm';
-import { NewsSaveDto } from './dto/news.save-dto.js';
 
 @Injectable()
 export class NewsRepository {
