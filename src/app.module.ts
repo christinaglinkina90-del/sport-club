@@ -1,17 +1,25 @@
 import { Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module.js';
 import { ServicesModule } from './service/services.module.js';
 import { MembershipModule } from './membership/memberships.module.js';
 import { UserMembershipsModule } from './user-membership/user-memberships.module.js';
-import { ScheduleModule } from './schedule/sсhedules.module.js';
+import { ScheduleModule } from './schedule/schedules.module.js';
 import { BookingsModule } from './booking/bookings.module.js';
 import { PaymentModule } from './payment/payments.module.js';
 import { NewsModule } from './news/news.module.js';
-import { TypeOrmModule } from '@nestjs/typeorm';
-
 
 @Module({
-  imports: [UsersModule,ServicesModule,MembershipModule,UserMembershipsModule,ScheduleModule, BookingsModule, PaymentModule, NewsModule, TypeOrmModule.forRoot({
+  imports: [
+    UsersModule,
+    ServicesModule,
+    MembershipModule,
+    UserMembershipsModule,
+    ScheduleModule,
+    BookingsModule,
+    PaymentModule,
+    NewsModule,
+    TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
       port: 5432,
@@ -20,7 +28,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       database: 'sport-club',
       autoLoadEntities: true,
       synchronize: true,
-    }),],
+    }),
+  ],
   controllers: [],
   providers: [],
 })
