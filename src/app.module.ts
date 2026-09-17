@@ -19,6 +19,7 @@ import { NewsModule } from './news/news.module.js';
     BookingsModule,
     PaymentModule,
     NewsModule,
+
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',

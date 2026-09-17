@@ -49,7 +49,7 @@ export class NewsService {
   }
 
   async deleteById(id: number): Promise<void> {
-    this.newsRepository.delete(id);
+    await this.newsRepository.delete(id);
   }
 
   async update(id: number, updateDto: NewsUpdateDto): Promise<void> {

@@ -8,6 +8,7 @@ import { User } from './user.entity.js';
 @Injectable()
 export class UsersRepository {
   constructor(
+    @InjectRepository(User)
     private readonly repository: Repository<User>,
   ) {}
 
