@@ -1,27 +1,59 @@
 import { Injectable } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
+import { User } from './user.entity';
+import { Role } from './enum/role.enum';
+import { UsersMapper } from './dto/user.mapper';
+import { UserDto } from './dto/user.dto';
+import { UserSaveDto } from './dto/user-save-dto';
+import { UserUpdateDto } from './dto/user.update-dto';
 
 @Injectable()
 export class UsersService {
-  constructor(private readonly repository: UsersRepository) {}
+  constructor(
+    private readonly repository: UsersRepository,
+    private readonly mapper: UsersMapper,
+  ) {}
 
-  async create(user: any): Promise<any> {
-    return this.repository.save(user);
+  async create(saveDto: UserSaveDto): Promise<UserDto> {
+    const entity: User = this.mapper.mapDtoToEntity(saveDto);
+    entity.role = Role.CLIENT;
+    entity.active = true;
+    await this.repository.save(entity);
+    return this.mapper.mapEntityToDto(entity)
   }
 
-  async getAllActiveUsers(): Promise<any[]> {
-    return this.repository.findAllActive();
+  async getAllActiveUsers(): Promise<UserDto[]> {
+    const users: User[] = await this.repository.findAllActive();
+    return this.mapper.mapEntityListToDtoList(users)
+  }
+  async getActiveUserById(id: number): Promise<UserDto> {
+    const user: User = await this.getActiveEntityById(id);
+
+    return this.mapper.mapEntityToDto(user);
   }
 
-  async getActiveUserById(id: number): Promise<any> {
-    return this.repository.findById(id);
+  async getActiveEntityById(id: number): Promise<User> {
+    const user: User | null = await this.repository.findById(id);
+    if (!user || !user.active) {
+      throw Error('User with id ${id} not found');
+    }
+    return user;
   }
 
-  async update(id: number, data: any): Promise<void> {
-    await this.repository.update(id, data);
+  async update(id: number, updateDto: UserUpdateDto): Promise<void> {
+    const foundUser: User | null = await this.repository.findById(id);
+    if (foundUser) {
+      foundUser.name = updateDto.newName;
+      await this.repository.save(foundUser);
+    }
   }
 
   async delete(id: number): Promise<void> {
-    await this.repository.deleteById(id);
+    const user: User | null = await this.getActiveEntityById(id);
+    if (!user) {
+      throw Error(`User with id ${id} not found`);
+    }
+    user.active = false;
+    await this.repository.save(user);
   }
 }

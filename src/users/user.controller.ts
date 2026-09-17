@@ -12,25 +12,27 @@ import {
 } from '@nestjs/common';
 
 
-import { User } from './user.entity.js';
-import { UsersService } from './users.service.js';
+import { UsersService } from './users.service';
+import { UserDto } from './dto/user.dto';
+import { UserSaveDto } from './dto/user-save-dto';
+import { UserUpdateDto } from './dto/user.update-dto';
 
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UsersService) {}
 
   @Post()
-  async create(@Body() user: User): Promise<User> {
-    return this.userService.create(user);
+  async create(@Body() saveDto: UserSaveDto): Promise<UserDto> {
+   return this.userService.create(saveDto)
   }
 
   @Get()
-  async getAll(): Promise<User[]> {
+  async getAll(): Promise<UserDto[]> {
     return await this.userService.getAllActiveUsers();
   }
 
   @Get(':id')
-  async getById(@Param('id', ParseIntPipe) id: number): Promise<User> {
+  async getById(@Param('id', ParseIntPipe) id: number): Promise<UserDto> {
     return this.userService.getActiveUserById(id);
   }
 
@@ -38,9 +40,9 @@ export class UserController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async update(
     @Param('id', ParseIntPipe) id: number,
-    @Body() user: User,
+    @Body() upDateDto: UserUpdateDto,
   ): Promise<void> {
-    await this.userService.update(id, user);
+    await this.userService.update(id, upDateDto);
   }
 
   @Delete(':id')

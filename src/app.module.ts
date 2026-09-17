@@ -1,13 +1,14 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from './users/users.module.js';
-import { ServicesModule } from './service/services.module.js';
-import { MembershipModule } from './membership/memberships.module.js';
-import { UserMembershipsModule } from './user-membership/user-memberships.module.js';
-import { ScheduleModule } from './schedule/schedules.module.js';
-import { BookingsModule } from './booking/bookings.module.js';
-import { PaymentModule } from './payment/payments.module.js';
-import { NewsModule } from './news/news.module.js';
+import { UsersModule } from './users/users.module';
+import { ServicesModule } from './service/services.module';
+import { MembershipModule } from './membership/memberships.module';
+import { UserMembershipsModule } from './user-membership/user-memberships.module';
+
+import { BookingsModule } from './booking/bookings.module';
+import { PaymentModule } from './payment/payments.module';
+import { NewsModule } from './news/news.module';
+import { ScheduleModule } from './schedule/sсhedules.module';
 
 @Module({
   imports: [
