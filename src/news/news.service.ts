@@ -5,6 +5,7 @@ import { NewsRepository } from './news.repository.js';
 import { NewsMapper } from './dto/news.mapper.js';
 import { News } from './news.entity.js';
 import { EntityNotFoundError } from 'typeorm';
+import { NewsUpdateDto } from './dto/news.update-dto.js';
 
 @Injectable()
 export class NewsService {
@@ -20,17 +21,6 @@ export class NewsService {
     return this.newsMapper.mapEntityToDto(entity);
   }
 
-  // async getAllActivePolicies(): Promise<PolicyDto[]> {
-  //   const policies: Policy[] = await this.repository.findAllActive();
-
-  //   if (policies.length === 0) {
-  //     throw new EntityNotFoundException(Policy.name);
-  //   }
-
-  //   policies.forEach((p: Policy): void => this.excludeInactiveCars(p));
-  //   return this.mapper.mapEntityListToDtoList(policies);
-  // }
-
   async getAllNews(): Promise<NewsDto[]> {
     const news: News[] = await this.newsRepository.findAll();
 
@@ -42,4 +32,40 @@ export class NewsService {
 
     return this.newsMapper.mapEntityListToDtoList(news);
   }
+
+  async getNewsById(id: number): Promise<NewsDto> {
+    const policy: News = await this.getEntityById(id);
+    return this.newsMapper.mapEntityToDto(policy);
+  }
+
+  private async getEntityById(id: number): Promise<News> {
+    const news: News | null = await this.newsRepository.findById(id);
+
+    if (!news) {
+      throw new EntityNotFoundError(News.name, id);
+    }
+
+    return news;
+  }
+
+  async deleteById(id: number): Promise<void> {
+    this.newsRepository.delete(id);
+  }
+
+  async update(id: number, updateDto: NewsUpdateDto): Promise<void> {
+    // this.validator.validateUpdateDto(updateDto);
+    const foundNews: News | null = await this.newsRepository.findById(id);
+
+    if (foundNews) {
+      foundNews.title = updateDto.newTitle;
+      foundNews.content = updateDto.newContent;
+      await this.newsRepository.save(foundNews);
+
+      // this.logger.log(`User updated: id ${id}, new name ${foundNews.title}`);
+    } else {
+      // throw new EntityNotFoundException(User.name, id);
+      throw new EntityNotFoundError(News.name, id);
+    }
+  }
+
 }
