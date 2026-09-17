@@ -12,8 +12,8 @@ import {
 } from '@nestjs/common';
 
 
-import { User } from './user.entity.js';
-import { UsersService } from './users.service.js';
+import { User } from './user.entity';
+import { UsersService } from './users.service';
 
 @Controller('users')
 export class UserController {

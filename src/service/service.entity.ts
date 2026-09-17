@@ -1,4 +1,4 @@
-import { ServiceType } from './enum/service-type.enum.js';
+import { ServiceType } from './enum/service-type.enum';
 
 export class Service {
   id: number;

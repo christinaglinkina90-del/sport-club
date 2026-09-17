@@ -1,6 +1,6 @@
-import { User } from '../users/user.entity.js';
-import { Schedule } from '../schedule/sсhedule.entity.js';
-import { BookingStatus } from './enum/booking-status.enum.js';
+import { Schedule } from '../schedule/schedule.entity';
+import { User } from '../users/user.entity';
+import { BookingStatus } from './enum/booking-status.enum';
 
 export class Booking {
   id: number;

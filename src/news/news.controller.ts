@@ -1,8 +1,8 @@
 import { Controller, Patch, Get, Param, Post, Delete, HttpStatus, HttpCode, ParseIntPipe, Body } from '@nestjs/common';
-import { NewsService } from './news.service.js';
-import { NewsSaveDto } from './dto/news.save-dto.js';
-import { NewsDto } from './dto/news.dto.js';
-import { NewsUpdateDto } from './dto/news.update-dto.js';
+import { NewsService } from './news.service';
+import { NewsSaveDto } from './dto/news.save-dto';
+import { NewsDto } from './dto/news.dto';
+import { NewsUpdateDto } from './dto/news.update-dto';
 
 @Controller('news')
 export class NewsController {
