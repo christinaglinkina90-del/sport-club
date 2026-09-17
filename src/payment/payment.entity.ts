@@ -1,6 +1,6 @@
-import { User } from '../users/user.entity.js';
-import { PaymentType } from './enum/payment-type.enum.js';
-import { PaymentStatus } from './enum/payment-status.enum.js';
+import { User } from '../users/user.entity';
+import { PaymentType } from './enum/payment-type.enum';
+import { PaymentStatus } from './enum/payment-status.enum';
 
 export class Payment {
   id: number;

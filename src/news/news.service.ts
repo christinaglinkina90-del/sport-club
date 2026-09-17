@@ -1,11 +1,11 @@
 import { Injectable } from '@nestjs/common';
-import { NewsDto } from './dto/news.dto.js';
-import { NewsSaveDto } from './dto/news.save-dto.js';
-import { NewsRepository } from './news.repository.js';
-import { NewsMapper } from './dto/news.mapper.js';
-import { News } from './news.entity.js';
+import { NewsDto } from './dto/news.dto';
+import { NewsSaveDto } from './dto/news.save-dto';
+import { NewsRepository } from './news.repository';
+import { NewsMapper } from './dto/news.mapper';
+import { News } from './news.entity';
 import { EntityNotFoundError } from 'typeorm';
-import { NewsUpdateDto } from './dto/news.update-dto.js';
+import { NewsUpdateDto } from './dto/news.update-dto';
 
 @Injectable()
 export class NewsService {

@@ -1,4 +1,4 @@
-import { MembershipType } from './enum/membership-type.enum.js';
+import { MembershipType } from './enum/membership-type.enum';
 
 export class Membership {
   id: number;
