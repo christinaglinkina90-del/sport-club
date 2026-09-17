@@ -1,6 +1,6 @@
-import { User } from '../users/user.entity.js';
-import { Membership } from '../membership/membership.entity.js';
-import { MembershipStatus } from './enum/membership-status.enum.js';
+import { User } from '../users/user.entity';
+import { Membership } from '../membership/membership.entity';
+import { MembershipStatus } from './enum/membership-status.enum';
 
 export class UserMembership {
   id: number;

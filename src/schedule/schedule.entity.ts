@@ -1,5 +1,5 @@
-import { Service } from '../service/service.entity.js';
-import { User } from '../users/user.entity.js';
+import { Service } from '../service/service.entity';
+import { User } from '../users/user.entity';
 
 
 export class Schedule {
