@@ -4,7 +4,7 @@ import { User } from './user.entity';
 import { Role } from './enum/role.enum';
 import { UsersMapper } from './dto/user.mapper';
 import { UserDto } from './dto/user.dto';
-import { UserSaveDto } from './dto/user-save-dto';
+import { UserSaveDto } from './dto/user.save-dto';
 import { UserUpdateDto } from './dto/user.update-dto';
 
 @Injectable()
@@ -26,6 +26,7 @@ export class UsersService {
     const users: User[] = await this.repository.findAllActive();
     return this.mapper.mapEntityListToDtoList(users)
   }
+
   async getActiveUserById(id: number): Promise<UserDto> {
     const user: User = await this.getActiveEntityById(id);
 
