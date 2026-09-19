@@ -33,7 +33,7 @@ export class ServicesService {
     return this.mapper.mapEntityToDto(service);
   }
 
-  private async getActiveEntityById(id: number): Promise<Service> {
+   async getActiveEntityById(id: number): Promise<Service> {
     const service: Service | null = await this.repository.findById(id);
     if (!service || !service.isActive) {
       throw new Error(`Service with id ${id} not found`);
