@@ -34,8 +34,8 @@ export class NewsService {
   }
 
   async getNewsById(id: number): Promise<NewsDto> {
-    const policy: News = await this.getEntityById(id);
-    return this.newsMapper.mapEntityToDto(policy);
+    const news: News = await this.getEntityById(id);
+    return this.newsMapper.mapEntityToDto(news);
   }
 
   private async getEntityById(id: number): Promise<News> {
