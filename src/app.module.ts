@@ -8,7 +8,7 @@ import { UserMembershipsModule } from './user-membership/user-memberships.module
 import { BookingsModule } from './booking/bookings.module';
 import { PaymentModule } from './payment/payments.module';
 import { NewsModule } from './news/news.module';
-import { ScheduleModule } from './schedule/sсhedules.module';
+import { SchedulesModule } from './schedule/schedules.module';
 
 @Module({
   imports: [
@@ -16,7 +16,7 @@ import { ScheduleModule } from './schedule/sсhedules.module';
     ServicesModule,
     MembershipsModule,
     UserMembershipsModule,
-    ScheduleModule,
+    SchedulesModule,
     BookingsModule,
     PaymentModule,
     NewsModule,
