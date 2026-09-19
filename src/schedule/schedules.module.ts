@@ -14,4 +14,4 @@ import { UsersModule } from '../users/users.module';
   providers: [SchedulesService, SchedulesRepository, SchedulesMapper],
   exports: [SchedulesService, SchedulesMapper],
 })
-export class ScheduleModule {}
+export class SchedulesModule {}
