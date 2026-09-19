@@ -10,6 +10,6 @@ import { ServicesService } from './services.service';
   imports: [TypeOrmModule.forFeature([Service])],
   controllers: [ServicesController],
   providers: [ServicesMapper,ServicesService,ServicesRepository],
-  exports: [ServicesMapper],
+  exports: [ServicesMapper, ServicesService],
 })
 export class ServicesModule {}
