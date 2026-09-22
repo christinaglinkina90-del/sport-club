@@ -7,7 +7,7 @@ import { UserDto } from './dto/user.dto';
 import { UserSaveDto } from './dto/user.save-dto';
 import { UserUpdateDto } from './dto/user.update-dto';
 import { UsersValidator } from './validation/users.validator';
-import { EntitySaveException } from '../exceptions/types/user-save.exception';
+import { EntitySaveException } from '../exceptions/types/entity-save.exception';
 import { EntityNotFoundException } from '../exceptions/types/entity-not-found.exception';
 
 @Injectable()
