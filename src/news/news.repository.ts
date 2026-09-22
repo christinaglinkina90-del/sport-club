@@ -11,7 +11,7 @@ export class NewsRepository {
   ) { }
 
   async save(news: News): Promise<News> {
-    return this.repository.create(news)
+    return this.repository.save(news)
   }
 
   async findAll(): Promise<News[]> {
