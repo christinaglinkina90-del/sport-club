@@ -6,15 +6,18 @@ import { UsersMapper } from './dto/user.mapper';
 import { UserDto } from './dto/user.dto';
 import { UserSaveDto } from './dto/user.save-dto';
 import { UserUpdateDto } from './dto/user.update-dto';
+import { UsersValidator } from './validation/users.validator';
 
 @Injectable()
 export class UsersService {
   constructor(
     private readonly repository: UsersRepository,
     private readonly mapper: UsersMapper,
+    private readonly validator: UsersValidator,
   ) {}
 
   async create(saveDto: UserSaveDto): Promise<UserDto> {
+    this.validator.validateSaveDto(saveDto);
     const entity: User = this.mapper.mapDtoToEntity(saveDto);
     entity.role = Role.CLIENT;
     entity.active = true;
@@ -42,6 +45,7 @@ export class UsersService {
   }
 
   async update(id: number, updateDto: UserUpdateDto): Promise<void> {
+    this.validator.validateUpdateDto(updateDto);
     const foundUser: User | null = await this.repository.findById(id);
     if (foundUser) {
       foundUser.name = updateDto.newName;
