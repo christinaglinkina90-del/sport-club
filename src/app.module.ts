@@ -9,6 +9,8 @@ import { BookingsModule } from './booking/bookings.module';
 import { PaymentModule } from './payment/payments.module';
 import { NewsModule } from './news/news.module';
 import { SchedulesModule } from './schedule/schedules.module';
+import { ConfigModule, ConfigService } from '@nestjs/config';
+import * as trace_events from 'node:trace_events';
 
 @Module({
   imports: [
@@ -20,15 +22,25 @@ import { SchedulesModule } from './schedule/schedules.module';
     BookingsModule,
     PaymentModule,
     NewsModule,
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: 'localhost',
-      port: 5432,
-      username: 'postgres',
-      password: 'qwerty123',
-      database: 'sport-club',
-      autoLoadEntities: true,
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      useFactory: (configService: ConfigService) => ({
+        type: 'postgres',
+        host: configService.getOrThrow<string>('DB_HOST'),
+        port: Number(configService.getOrThrow<string>('DB_PORT')),
+        username: configService.getOrThrow<string>('DB_USERNAME'),
+        password: configService.getOrThrow<string>('DB_PASSWORD'),
+        database: configService.getOrThrow<string>('DB_DATABASE'),
+        autoLoadEntities: true,
+        synchronize: true,
+        // ssl: {
+        //   rejectUnauthorized: true,
+        // },
+      }),
+      inject: [ConfigService],
+    }),
+    ConfigModule.forRoot({
+      isGlobal: true,
     }),
   ],
   controllers: [],
