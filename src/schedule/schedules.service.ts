@@ -7,6 +7,7 @@ import { ScheduleSaveDto } from './dto/schedule.save-dto';
 import { ScheduleUpdateDto } from './dto/schedule.update-dto';
 import { ServicesService } from '../service/services.service';
 import { UsersService } from '../users/users.service';
+import { SchedulesValidator } from './schedulesValidator/schedulesValidator';
 
 @Injectable()
 export class SchedulesService {
@@ -15,9 +16,11 @@ export class SchedulesService {
     private readonly mapper: SchedulesMapper,
     private readonly servicesService: ServicesService,
     private readonly usersService: UsersService,
+    private readonly validator: SchedulesValidator,
   ) {}
 
   async create(saveDto: ScheduleSaveDto): Promise<ScheduleDto> {
+    this.validator.validateSaveDto(saveDto);
     const service = await this.servicesService.getActiveEntityById(
       saveDto.serviceId,
     );
@@ -57,6 +60,7 @@ export class SchedulesService {
   }
 
   async update(id: number, updateDto: ScheduleUpdateDto): Promise<void> {
+    this.validator.validateUpdateDto(updateDto);
     const schedule = await this.getActiveEntityById(id);
     if (updateDto.capacity) schedule.capacity = updateDto.capacity;
     if (updateDto.date) schedule.date = new Date(updateDto.date);
