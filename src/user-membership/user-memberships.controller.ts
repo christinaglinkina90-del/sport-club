@@ -2,7 +2,6 @@ import { Body, Controller, Delete, Get, Param, ParseEnumPipe, ParseIntPipe, Patc
 import { UserMembershipsService } from './user-memberships.service';
 import { UserMembershipSaveDto } from './dto/user-membership.save-dto';
 import { UserMembershipDto } from './dto/user-membership.dto';
-import { NewsUpdateDto } from '../news/dto/news.update-dto';
 import { MembershipStatus } from './enum/membership-status.enum';
 
 @Controller('users-memberships')
@@ -13,9 +12,10 @@ export class UserMembershipsController {
   }
 
   @Post()
-  async create(userMembershipSaveDto: UserMembershipSaveDto): Promise<UserMembershipDto> {
+  async create(@Body() userMembershipSaveDto: UserMembershipSaveDto): Promise<UserMembershipDto> {
     return await this.userMembershipService.create(userMembershipSaveDto);
   }
+
 
   @Get()
   async getAll(): Promise<UserMembershipDto[]> {
@@ -29,7 +29,7 @@ export class UserMembershipsController {
 
   @Delete(':id')
   async deleteById(@Param('id', ParseIntPipe) id: number): Promise<void> {
-    this.userMembershipService.deleteById(id);
+    await this.userMembershipService.deleteById(id);
   }
 
   @Patch(':id')

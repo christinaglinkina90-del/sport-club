@@ -10,6 +10,7 @@ import { MembershipsService } from '../membership/memberships.service';
 import { UserMembershipDto } from './dto/user-membership.dto';
 import { EntityNotFoundError } from 'typeorm';
 import { MembershipStatus } from './enum/membership-status.enum';
+import { UserMembershipValidator } from './validator/user-membership.validator';
 
 @Injectable()
 export class UserMembershipsService {
@@ -18,11 +19,13 @@ export class UserMembershipsService {
     private readonly userMembershipMapper: UserMembershipMapper,
     private readonly userService: UsersService,
     private readonly membershipService: MembershipsService,
+    private readonly validator: UserMembershipValidator,
   ) {}
 
   async create(
     uMemShipSaveDto: UserMembershipSaveDto,
   ): Promise<UserMembershipDto> {
+    this.validator.validateSaveDto(uMemShipSaveDto);
     const user: User = await this.userService.getActiveEntityById(
       uMemShipSaveDto.userId,
     );

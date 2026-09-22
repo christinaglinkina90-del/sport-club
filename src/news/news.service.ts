@@ -57,8 +57,12 @@ export class NewsService {
     const foundNews: News | null = await this.newsRepository.findById(id);
 
     if (foundNews) {
-      foundNews.title = updateDto.newTitle;
-      foundNews.content = updateDto.newContent;
+      if (updateDto.title !== undefined) {
+        foundNews.title = updateDto.title;
+      }
+      if (updateDto.content !== undefined) {
+        foundNews.content = updateDto.content;
+      }
       await this.newsRepository.save(foundNews);
 
       // this.logger.log(`User updated: id ${id}, new name ${foundNews.title}`);
