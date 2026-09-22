@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserMembership } from './user-membership.entity';
 import { Repository } from 'typeorm';
-import { News } from '../news/news.entity';
+
 
 @Injectable()
 export class UserMembershipsRepository {
@@ -12,7 +12,7 @@ export class UserMembershipsRepository {
   ) {}
 
   async save(userMembership: UserMembership): Promise<UserMembership> {
-    return this.repository.create(userMembership);
+    return this.repository.save(userMembership);
   }
 
   async findAll(): Promise<UserMembership[]> {
