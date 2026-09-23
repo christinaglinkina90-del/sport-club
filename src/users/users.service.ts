@@ -39,7 +39,7 @@ export class UsersService {
   async getActiveEntityById(id: number): Promise<User> {
     const user: User | null = await this.repository.findById(id);
     if (!user || !user.active) {
-      throw Error('User with id ${id} not found');
+      throw new Error(`User with id ${id} not found`);
     }
     return user;
   }
@@ -56,7 +56,7 @@ export class UsersService {
   async delete(id: number): Promise<void> {
     const user: User | null = await this.getActiveEntityById(id);
     if (!user) {
-      throw Error(`User with id ${id} not found`);
+      throw new Error(`User with id ${id} not found`);
     }
     user.active = false;
     await this.repository.save(user);
