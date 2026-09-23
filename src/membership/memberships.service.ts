@@ -5,6 +5,7 @@ import { Membership } from './membership.entity';
 import { MembershipDto } from './dto/membership.dto';
 import { MembershipSaveDto } from './dto/membership.save-dto';
 import { MembershipUpdateDto } from './dto/membership.update-dto';
+import { EntitySaveException } from '../exceptions/types/entity-save.exception';
 
 @Injectable()
 export class MembershipsService {
@@ -14,7 +15,11 @@ export class MembershipsService {
   ) {}
 
   async create(saveDto: MembershipSaveDto): Promise<MembershipDto> {
-    const entity = this.mapper.mapDtoToEntity(saveDto);
+    const foundSimilar: Membership[] = await this.repository.findSimilar(saveDto.name, saveDto.type);
+    if (foundSimilar.length !== 0){
+      throw new EntitySaveException(Membership.name, 'name and type');
+    }
+    const entity: Membership = this.mapper.mapDtoToEntity(saveDto);
     entity.isActive = true;
     await this.repository.save(entity);
     return this.mapper.mapEntityToDto(entity);
