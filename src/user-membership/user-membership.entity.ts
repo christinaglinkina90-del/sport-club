@@ -4,19 +4,20 @@ import { MembershipStatus } from './enum/membership-status.enum';
 import {
   Column,
   Entity,
-  OneToMany,
+  JoinColumn,
+  ManyToOne,
   OneToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { PaymentType } from '../payment/enum/payment-type.enum';
 
 @Entity('user_memberships')
 export class UserMembership {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
-  @Column({ nullable: false })
+  @ManyToOne((): typeof User => User)
   user: User;
   @OneToOne((): typeof Membership => Membership)
+  @JoinColumn()
   membership: Membership;
   @Column({ nullable: false, type: 'enum', enum: MembershipStatus })
   status: MembershipStatus;
