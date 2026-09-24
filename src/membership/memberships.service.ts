@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { MembershipsRepository } from './memberships.repository';
 import { MembershipsMapper } from './dto/memberships.mapper';
 import { Membership } from './membership.entity';
@@ -8,6 +8,8 @@ import { MembershipUpdateDto } from './dto/membership.update-dto';
 
 @Injectable()
 export class MembershipsService {
+  private readonly logger: Logger = new Logger(MembershipsService.name);
+
   constructor(
     private readonly repository: MembershipsRepository,
     private readonly mapper: MembershipsMapper,
@@ -17,6 +19,9 @@ export class MembershipsService {
     const entity = this.mapper.mapDtoToEntity(saveDto);
     entity.isActive = true;
     await this.repository.save(entity);
+
+    this.logger.log(`Membership created: id ${entity.id}, name ${entity.name}`);
+
     return this.mapper.mapEntityToDto(entity);
   }
 
@@ -42,11 +47,17 @@ export class MembershipsService {
     const membership = await this.getActiveEntityById(id);
     membership.name = updateDto.newName;
     await this.repository.save(membership);
+
+    this.logger.log(
+      `Membership updated: id ${id}, new name ${membership.name}`,
+    );
   }
 
   async delete(id: number): Promise<void> {
     const membership = await this.getActiveEntityById(id);
     membership.isActive = false;
     await this.repository.save(membership);
+
+    this.logger.log(`Membership marked as inactive: id ${id}`);
   }
 }

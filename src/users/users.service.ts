@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { UsersRepository } from './users.repository';
 import { User } from './user.entity';
 import { Role } from './enum/role.enum';
@@ -10,6 +10,8 @@ import { UsersValidator } from './validation/users.validator';
 
 @Injectable()
 export class UsersService {
+  private readonly logger: Logger = new Logger(UsersService.name);
+
   constructor(
     private readonly repository: UsersRepository,
     private readonly mapper: UsersMapper,
@@ -22,6 +24,9 @@ export class UsersService {
     entity.role = Role.CLIENT;
     entity.active = true;
     await this.repository.save(entity);
+
+    this.logger.log(`User created: id ${entity.id}, email: ${entity.email}`);
+
     return this.mapper.mapEntityToDto(entity)
   }
 
@@ -50,6 +55,7 @@ export class UsersService {
     if (foundUser) {
       foundUser.name = updateDto.newName;
       await this.repository.save(foundUser);
+      this.logger.log(`User updated: id ${id}, new name: ${foundUser.name}`);
     }
   }
 
@@ -60,5 +66,6 @@ export class UsersService {
     }
     user.active = false;
     await this.repository.save(user);
+    this.logger.log(`User marked as inactive: id ${id}`);
   }
 }
