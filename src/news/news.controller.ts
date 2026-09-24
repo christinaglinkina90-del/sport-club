@@ -6,10 +6,10 @@ import { NewsUpdateDto } from './dto/news.update-dto';
 
 @Controller('news')
 export class NewsController {
-  constructor(private readonly newsService: NewsService) { }
-  
+  constructor(private readonly newsService: NewsService) {}
+
   @Post()
-  async create(newsSaveDto: NewsSaveDto): Promise<NewsDto> {
+  async create(@Body() newsSaveDto: NewsSaveDto): Promise<NewsDto> {
     return await this.newsService.create(newsSaveDto);
   }
 

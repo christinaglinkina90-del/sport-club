@@ -33,9 +33,7 @@ import * as trace_events from 'node:trace_events';
         database: configService.getOrThrow<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
-        // ssl: {
-        //   rejectUnauthorized: true,
-        // },
+        ssl: { rejectUnauthorized: false },
       }),
       inject: [ConfigService],
     }),

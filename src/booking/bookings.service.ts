@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { BookingsRepository } from './bookings.repository';
 import { BookingsMapper } from './dto/bookings.mapper';
 import { Booking } from './booking.entity';
@@ -11,6 +11,8 @@ import { SchedulesService } from '../schedule/schedules.service';
 
 @Injectable()
 export class BookingsService {
+  private readonly logger: Logger = new Logger(BookingsService.name);
+
   constructor(
     private readonly repository: BookingsRepository,
     private readonly mapper: BookingsMapper,
@@ -30,6 +32,11 @@ export class BookingsService {
     entity.status = BookingStatus.PENDING;
 
     await this.repository.save(entity);
+
+    this.logger.log(
+      `Booking created: id ${entity.id}, userId ${user.id}, scheduleId ${schedule.id}, status ${entity.status}`,
+    );
+
     return this.mapper.mapEntityToDto(entity);
   }
 
@@ -52,8 +59,13 @@ export class BookingsService {
       throw new NotFoundException(`Booking with id ${id} not found`);
     }
     if (dto.status) {
+      const oldStatus = booking.status;
       booking.status = dto.status;
       await this.repository.save(booking);
+
+      this.logger.log(
+        `Booking status changed: id ${id}, ${oldStatus} -> ${booking.status}`,
+      );
     }
   }
 
@@ -63,5 +75,7 @@ export class BookingsService {
       throw new NotFoundException(`Booking with id ${id} not found`);
     }
     await this.repository.delete(id);
+
+    this.logger.log(`Booking deleted: id ${id}`);
   }
 }
