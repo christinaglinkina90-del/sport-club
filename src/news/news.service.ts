@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { NewsDto } from './dto/news.dto';
 import { NewsSaveDto } from './dto/news.save-dto';
 import { NewsRepository } from './news.repository';
@@ -9,15 +9,19 @@ import { NewsUpdateDto } from './dto/news.update-dto';
 
 @Injectable()
 export class NewsService {
-  
+  private readonly logger: Logger = new Logger(NewsService.name);
+
   constructor(
     private readonly newsRepository: NewsRepository,
     private readonly newsMapper: NewsMapper,
-  ) { }
+  ) {}
 
   async create(newsSaveDto: NewsSaveDto): Promise<NewsDto> {
     const entity: News = this.newsMapper.mapDtoToEntity(newsSaveDto);
     await this.newsRepository.save(entity);
+
+    this.logger.log(`News created: id ${entity.id}, title ${entity.title}`);
+
     return this.newsMapper.mapEntityToDto(entity);
   }
 
@@ -25,8 +29,6 @@ export class NewsService {
     const news: News[] = await this.newsRepository.findAll();
 
     if (news.length === 0) {
-      // todo необходимо создать логгер и классы исключений
-      // throw new EntityNotFoundException(News.name);
       throw new EntityNotFoundError(News.name, '');
     }
 
@@ -50,10 +52,11 @@ export class NewsService {
 
   async deleteById(id: number): Promise<void> {
     await this.newsRepository.delete(id);
+
+    this.logger.log(`News deleted: id ${id}`);
   }
 
   async update(id: number, updateDto: NewsUpdateDto): Promise<void> {
-    // this.validator.validateUpdateDto(updateDto);
     const foundNews: News | null = await this.newsRepository.findById(id);
 
     if (foundNews) {
@@ -65,11 +68,9 @@ export class NewsService {
       }
       await this.newsRepository.save(foundNews);
 
-      // this.logger.log(`User updated: id ${id}, new name ${foundNews.title}`);
+      this.logger.log(`News updated: id ${id}, title ${foundNews.title}`);
     } else {
-      // throw new EntityNotFoundException(User.name, id);
       throw new EntityNotFoundError(News.name, id);
     }
   }
-
 }
