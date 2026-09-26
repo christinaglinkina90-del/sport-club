@@ -11,6 +11,7 @@ import { NewsModule } from './news/news.module';
 import { SchedulesModule } from './schedule/schedules.module';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as trace_events from 'node:trace_events';
+import { AiModule } from './ai/ai.module';
 
 @Module({
   imports: [
@@ -22,6 +23,7 @@ import * as trace_events from 'node:trace_events';
     BookingsModule,
     PaymentModule,
     NewsModule,
+    AiModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
