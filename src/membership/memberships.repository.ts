@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { Membership } from './membership.entity';
+import { MembershipType } from './enum/membership-type.enum';
 
 @Injectable()
 export class MembershipsRepository {
@@ -24,5 +25,14 @@ export class MembershipsRepository {
 
   async deleteById(id: number): Promise<void> {
     await this.repository.delete(id);
+  }
+
+  async findSimilar(name: string, type: MembershipType): Promise<Membership[]> {
+    return this.repository.find({
+      where: {
+        name: name,
+        type: type,
+      }
+    });
   }
 }
