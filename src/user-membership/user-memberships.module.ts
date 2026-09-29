@@ -7,6 +7,7 @@ import { UserMembershipsService } from './user-memberships.service';
 import { UserMembershipsRepository } from './user-memberships.repository';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UserMembership } from './user-membership.entity';
+import { UserMembershipValidator } from './validator/user-membership.validator';
 
 @Module({
   controllers: [UserMembershipsController],
@@ -14,6 +15,7 @@ import { UserMembership } from './user-membership.entity';
     UserMembershipMapper,
     UserMembershipsService,
     UserMembershipsRepository,
+    UserMembershipValidator
   ],
   imports: [
     MembershipsModule,

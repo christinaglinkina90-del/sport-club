@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { SchedulesRepository } from './schedules.repository';
 import { SchedulesMapper } from './dto/schedules.mapper';
 import { Schedule } from './schedule.entity';
@@ -11,6 +11,8 @@ import { SchedulesValidator } from './schedulesValidator/schedulesValidator';
 
 @Injectable()
 export class SchedulesService {
+  private readonly logger: Logger = new Logger(SchedulesService.name);
+
   constructor(
     private readonly repository: SchedulesRepository,
     private readonly mapper: SchedulesMapper,
@@ -38,6 +40,14 @@ export class SchedulesService {
     entity.isActive = true;
 
     await this.repository.save(entity);
+    this.logger.log(
+      `Schedule created: id ${entity.id}, 
+      service ${entity.service.id}, 
+      trainer ${entity.trainer.id}, 
+      date ${entity.date}, 
+      time ${entity.startTime}-${entity.endTime}`,
+    );
+
     return this.mapper.mapEntityToDto(entity);
   }
 
@@ -67,11 +77,18 @@ export class SchedulesService {
     if (updateDto.startTime) schedule.startTime = updateDto.startTime;
     if (updateDto.endTime) schedule.endTime = updateDto.endTime;
     await this.repository.save(schedule);
+    this.logger.log(
+      `Schedule updated: id ${id}, 
+      date ${schedule.date}, 
+      time ${schedule.startTime}-${schedule.endTime}, 
+      capacity ${schedule.capacity}`,
+    );
   }
 
   async delete(id: number): Promise<void> {
     const schedule = await this.getActiveEntityById(id);
     schedule.isActive = false;
     await this.repository.save(schedule);
+    this.logger.log(`Schedule marked as inactive: id ${id}`);
   }
 }

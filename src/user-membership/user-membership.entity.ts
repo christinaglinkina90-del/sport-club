@@ -1,3 +1,10 @@
+import {
+  Column,
+  Entity,
+  JoinColumn,
+  ManyToOne,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 import { User } from '../users/user.entity';
 import { Membership } from '../membership/membership.entity';
 import { MembershipStatus } from './enum/membership-status.enum';

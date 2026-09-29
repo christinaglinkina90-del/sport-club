@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { UserMembershipsRepository } from './user-memberships.repository';
 import { UserMembershipMapper } from './dto/user-membership.mapper';
 import { UserMembershipSaveDto } from './dto/user-membership.save-dto';
@@ -10,14 +10,18 @@ import { MembershipsService } from '../membership/memberships.service';
 import { UserMembershipDto } from './dto/user-membership.dto';
 import { EntityNotFoundError } from 'typeorm';
 import { MembershipStatus } from './enum/membership-status.enum';
+import { UserMembershipValidator } from './validator/user-membership.validator';
 
 @Injectable()
 export class UserMembershipsService {
+  private readonly logger: Logger = new Logger(UserMembershipsService.name);
+
   constructor(
     private readonly userMemberShipRepository: UserMembershipsRepository,
     private readonly userMembershipMapper: UserMembershipMapper,
     private readonly userService: UsersService,
     private readonly membershipService: MembershipsService,
+    private readonly validator: UserMembershipValidator,
   ) {}
 
   async create(
@@ -28,6 +32,7 @@ export class UserMembershipsService {
     // 1. Получить сущность юзера
     // 2. Получить даты
     // 3. проверить существуют ли уже в данном временном промежутке абонементы
+    this.validator.validateSaveDto(uMemShipSaveDto);
     const user: User = await this.userService.getActiveEntityById(
       uMemShipSaveDto.userId,
     );
@@ -40,6 +45,11 @@ export class UserMembershipsService {
     entity.user = user;
     entity.membership = membership;
     await this.userMemberShipRepository.save(entity);
+
+    this.logger.log(
+      `UserMembership created: id ${entity.id}, userId ${user.id}, membershipId ${membership.id}, status ${entity.status}`,
+    );
+
     return this.userMembershipMapper.mapEntityToDto(entity);
   }
 
@@ -69,20 +79,24 @@ export class UserMembershipsService {
   }
 
   async deleteById(id: number): Promise<void> {
-    this.userMemberShipRepository.delete(id);
+    await this.userMemberShipRepository.delete(id);
+
+    this.logger.log(`UserMembership deleted: id ${id}`);
   }
 
   async update(id: number, newStatus: MembershipStatus): Promise<void> {
-    // this.validator.validateUpdateDto(updateDto);
     const foundUserMembership: UserMembership | null =
       await this.userMemberShipRepository.findById(id);
 
     if (foundUserMembership) {
+      const oldStatus = foundUserMembership.status;
       foundUserMembership.status = newStatus;
       await this.userMemberShipRepository.save(foundUserMembership);
-      // this.logger.log(`User updated: id ${id}, new name ${foundNews.title}`);
+
+      this.logger.log(
+        `UserMembership status changed: id ${id}, ${oldStatus} -> ${foundUserMembership.status}`,
+      );
     } else {
-      // throw new EntityNotFoundException(User.name, id);
       throw new EntityNotFoundError(UserMembership.name, id);
     }
   }

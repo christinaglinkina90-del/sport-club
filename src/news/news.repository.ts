@@ -25,6 +25,6 @@ export class NewsRepository {
   }
 
   async delete(id: number): Promise<void> {
-    this.repository.delete(id)
+    await this.repository.delete(id)
   }
 }

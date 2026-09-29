@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { PaymentsRepository } from './payments.repository';
 import { PaymentsMapper } from './dto/payments.mapper';
 import { Payment } from './payment.entity';
@@ -15,6 +15,8 @@ import { ServicesService } from '../service/services.service';
 
 @Injectable()
 export class PaymentsService {
+  private readonly logger: Logger = new Logger(PaymentsService.name);
+
   constructor(
     private readonly repository: PaymentsRepository,
     private readonly mapper: PaymentsMapper,
@@ -26,23 +28,26 @@ export class PaymentsService {
   async createMembershipPayment(
     dto: MembershipPaymentSaveDto,
   ): Promise<PaymentDto> {
-    const user = await this.usersService.getActiveEntityById(dto.userId); //1. Находим пользователя
-
+    const user = await this.usersService.getActiveEntityById(dto.userId);
     const membership = await this.membershipsService.getActiveEntityById(
-      dto.membershipId); // 2. Находим абонемент
+      dto.membershipId,
+    );
 
-    const payment = new Payment(); // 3. Создаём платёж
+    const payment = new Payment();
     payment.user = user;
-    payment.amount = membership.price; // ← цена из БазыД
+    payment.amount = membership.price;
     payment.type = PaymentType.MEMBERSHIP;
     payment.status = PaymentStatus.PENDING;
 
-    // 4. Сохраняем
     await this.repository.save(payment);
 
-    // 5. Возвращаем DTO
+    this.logger.log(
+      `Membership payment created: id ${payment.id}, userId ${user.id}, membershipId ${membership.id}, amount ${payment.amount}`,
+    );
+
     return this.mapper.mapEntityToDto(payment);
   }
+
   async createServicePayment(dto: ServicePaymentSaveDto): Promise<PaymentDto> {
     const user = await this.usersService.getActiveEntityById(dto.userId);
     const service = await this.servicesService.getActiveEntityById(
@@ -56,8 +61,14 @@ export class PaymentsService {
     payment.status = PaymentStatus.PENDING;
 
     await this.repository.save(payment);
+
+    this.logger.log(
+      `Service payment created: id ${payment.id}, userId ${user.id}, serviceId ${service.id}, amount ${payment.amount}`,
+    );
+
     return this.mapper.mapEntityToDto(payment);
   }
+
   async createSingleVisitPayment(
     dto: SingleVisitPaymentSaveDto,
   ): Promise<PaymentDto> {
@@ -65,17 +76,24 @@ export class PaymentsService {
 
     const payment = new Payment();
     payment.user = user;
-    payment.amount = 0; // ← временно, пока нет BookingsService
+    payment.amount = 0;
     payment.type = PaymentType.SINGLE_VISIT;
     payment.status = PaymentStatus.PENDING;
 
     await this.repository.save(payment);
+
+    this.logger.log(
+      `Single visit payment created: id ${payment.id}, userId ${user.id}, bookingId ${dto.bookingId}, amount ${payment.amount}`,
+    );
+
     return this.mapper.mapEntityToDto(payment);
   }
+
   async getAllPayments(): Promise<PaymentDto[]> {
     const payments = await this.repository.findAll();
     return this.mapper.mapEntityListToDtoList(payments);
   }
+
   async getPaymentById(id: number): Promise<PaymentDto> {
     const payment = await this.repository.findById(id);
     if (!payment) {
@@ -83,21 +101,30 @@ export class PaymentsService {
     }
     return this.mapper.mapEntityToDto(payment);
   }
+
   async updateStatus(id: number, updateDto: PaymentUpdateDto): Promise<void> {
     const payment = await this.repository.findById(id);
     if (!payment) {
       throw new NotFoundException(`Payment with id ${id} not found`);
     }
     if (updateDto.status) {
+      const oldStatus = payment.status;
       payment.status = updateDto.status;
       await this.repository.save(payment);
+
+      this.logger.log(
+        `Payment status changed: id ${id}, ${oldStatus} -> ${payment.status}`,
+      );
     }
   }
+
   async delete(id: number): Promise<void> {
     const payment = await this.repository.findById(id);
     if (!payment) {
       throw new NotFoundException(`Payment with id ${id} not found`);
     }
     await this.repository.delete(id);
+
+    this.logger.log(`Payment deleted: id ${id}`);
   }
 }
