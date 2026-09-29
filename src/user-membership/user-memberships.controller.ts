@@ -13,7 +13,7 @@ export class UserMembershipsController {
   }
 
   @Post()
-  async create(userMembershipSaveDto: UserMembershipSaveDto): Promise<UserMembershipDto> {
+  async create(@Body() userMembershipSaveDto: UserMembershipSaveDto): Promise<UserMembershipDto> {
     return await this.userMembershipService.create(userMembershipSaveDto);
   }
 

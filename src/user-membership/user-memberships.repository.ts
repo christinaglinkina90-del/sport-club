@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { UserMembership } from './user-membership.entity';
-import { Repository } from 'typeorm';
-import { News } from '../news/news.entity';
+import { LessThanOrEqual, MoreThanOrEqual, Repository } from 'typeorm';
 
 @Injectable()
 export class UserMembershipsRepository {
@@ -12,7 +11,7 @@ export class UserMembershipsRepository {
   ) {}
 
   async save(userMembership: UserMembership): Promise<UserMembership> {
-    return this.repository.create(userMembership);
+    return this.repository.save(userMembership);
   }
 
   async findAll(): Promise<UserMembership[]> {
@@ -27,5 +26,21 @@ export class UserMembershipsRepository {
 
   async delete(id: number): Promise<void> {
     this.repository.delete(id);
+  }
+
+  async hasPeriodOverlap(
+    userId: number,
+    newStartDate: Date,
+    newEndDate: Date
+  ): Promise<boolean> {
+    const overlappingCount = await this.repository.count({
+      where: {
+        user: { id: userId },
+        startDate: LessThanOrEqual(newEndDate),
+        endDate: MoreThanOrEqual(newStartDate),
+      },
+    });
+
+    return overlappingCount > 0;
   }
 }

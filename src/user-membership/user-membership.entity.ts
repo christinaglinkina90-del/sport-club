@@ -1,14 +1,7 @@
 import { User } from '../users/user.entity';
 import { Membership } from '../membership/membership.entity';
 import { MembershipStatus } from './enum/membership-status.enum';
-import {
-  Column,
-  Entity,
-  JoinColumn,
-  ManyToOne,
-  OneToOne,
-  PrimaryGeneratedColumn,
-} from 'typeorm';
+import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('user_memberships')
 export class UserMembership {
@@ -16,8 +9,7 @@ export class UserMembership {
   id: number;
   @ManyToOne((): typeof User => User)
   user: User;
-  @OneToOne((): typeof Membership => Membership)
-  @JoinColumn()
+  @ManyToOne((): typeof Membership => Membership)
   membership: Membership;
   @Column({ nullable: false, type: 'enum', enum: MembershipStatus })
   status: MembershipStatus;

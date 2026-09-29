@@ -23,6 +23,11 @@ export class UserMembershipsService {
   async create(
     uMemShipSaveDto: UserMembershipSaveDto,
   ): Promise<UserMembershipDto> {
+    // Перед записью проверить существование других абонементов
+    // на данный промежуток времени с таким же типом абонемента
+    // 1. Получить сущность юзера
+    // 2. Получить даты
+    // 3. проверить существуют ли уже в данном временном промежутке абонементы
     const user: User = await this.userService.getActiveEntityById(
       uMemShipSaveDto.userId,
     );
@@ -30,11 +35,10 @@ export class UserMembershipsService {
       await this.membershipService.getActiveEntityById(
         uMemShipSaveDto.membershipId,
       );
-    const entity: UserMembership = this.userMembershipMapper.mapDtoToEntity(
-      uMemShipSaveDto,
-      user,
-      membership,
-    );
+    const entity: UserMembership =
+      this.userMembershipMapper.mapDtoToEntity(uMemShipSaveDto);
+    entity.user = user;
+    entity.membership = membership;
     await this.userMemberShipRepository.save(entity);
     return this.userMembershipMapper.mapEntityToDto(entity);
   }
