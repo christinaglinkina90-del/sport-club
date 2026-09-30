@@ -1,14 +1,12 @@
 import {
   Column,
   Entity,
-  JoinColumn,
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
 import { Membership } from '../membership/membership.entity';
 import { MembershipStatus } from './enum/membership-status.enum';
-import { Column, Entity, ManyToOne, PrimaryGeneratedColumn } from 'typeorm';
 
 @Entity('user_memberships')
 export class UserMembership {
