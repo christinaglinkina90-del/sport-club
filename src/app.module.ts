@@ -35,7 +35,7 @@ import { AiModule } from './ai/ai.module';
         database: configService.getOrThrow<string>('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
-        ssl: { rejectUnauthorized: false },
+        //ssl: { rejectUnauthorized: false },
       }),
       inject: [ConfigService],
     }),
