@@ -3,9 +3,28 @@ import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ValidationPipe } from '@nestjs/common';
 import { RequestLoggingInterceptor } from './logging/request-logging.interceptor';
+import { WinstonModule } from 'nest-winston';
+import winston from 'winston';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    logger: WinstonModule.createLogger({
+      format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.printf(
+          ({ timestamp, level, context, message }) =>
+            `[${timestamp}] [${level}] [${context}] ${message}`,
+        ),
+      ),
+      transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({
+          filename: 'logs/app.log',
+        }),
+      ],
+      level: 'debug',
+    }),
+  });
 
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
