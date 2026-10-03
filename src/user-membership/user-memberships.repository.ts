@@ -15,7 +15,12 @@ export class UserMembershipsRepository {
   }
 
   async findAll(): Promise<UserMembership[]> {
-    return this.repository.find({});
+    return this.repository.find({
+      relations: {
+        user: true,
+        membership: true
+      }, // <--- Явно просим подгрузить связи
+    });
   }
 
   async findById(id: number): Promise<UserMembership | null> {

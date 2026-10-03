@@ -25,6 +25,7 @@ export class UserMembershipMapper {
   mapEntityToDto(entity: UserMembership): UserMembershipDto {
     const dto: UserMembershipDto = new UserMembershipDto();
     dto.id = entity.id;
+    dto.status = entity.status;
     if(entity.user) {
       dto.user = this.usersMapper.mapEntityToDto(entity.user);
     }
