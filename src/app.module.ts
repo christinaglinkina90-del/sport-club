@@ -26,17 +26,20 @@ import { AiModule } from './ai/ai.module';
     AiModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
-      useFactory: (configService: ConfigService) => ({
-        type: 'postgres',
-        host: configService.getOrThrow<string>('DB_HOST'),
-        port: Number(configService.getOrThrow<string>('DB_PORT')),
-        username: configService.getOrThrow<string>('DB_USERNAME'),
-        password: configService.getOrThrow<string>('DB_PASSWORD'),
-        database: configService.getOrThrow<string>('DB_DATABASE'),
-        autoLoadEntities: true,
-        synchronize: true,
-        ssl: { rejectUnauthorized: false },
-      }),
+      useFactory: (configService: ConfigService) => {
+        const enableSsl = configService.get<string>('DB_SSL') === 'true';
+        return {
+          type: 'postgres',
+          host: configService.getOrThrow<string>('DB_HOST'),
+          port: Number(configService.getOrThrow<string>('DB_PORT')),
+          username: configService.getOrThrow<string>('DB_USERNAME'),
+          password: configService.getOrThrow<string>('DB_PASSWORD'),
+          database: configService.getOrThrow<string>('DB_DATABASE'),
+          autoLoadEntities: true,
+          synchronize: true,
+          ssl: enableSsl? { rejectUnauthorized: false } : false,
+        };
+      },
       inject: [ConfigService],
     }),
     ConfigModule.forRoot({
