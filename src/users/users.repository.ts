@@ -3,8 +3,6 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 
-
-
 @Injectable()
 export class UsersRepository {
   constructor(
@@ -22,14 +20,6 @@ export class UsersRepository {
 
   async findById(id: number): Promise<User | null> {
     return this.repository.findOneBy({ id });
-  }
-
-  async getActiveUserById(id: number): Promise<User | null> {
-    return this.repository.findOneBy({ id, active: true });
-  }
-
-  async update(id: number, data: Partial<User>): Promise<void> {
-    await this.repository.update(id, data);
   }
 
   async deleteById(id: number): Promise<void> {

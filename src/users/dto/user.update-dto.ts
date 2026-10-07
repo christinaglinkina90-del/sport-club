@@ -1,11 +1,12 @@
-import { IsString, Length, Matches } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger';
+import { Length, Matches } from 'class-validator';
 
 export class UserUpdateDto {
-
-  @IsString()
+  @ApiProperty()
   @Length(2, 30)
   @Matches(/^[A-Za-z\-' ]+$/, {
-    message: 'Name should contain only letters, spaces, dashes and apostrophes',
+    message:
+      'Name should contain only capital and small letters, spaces, dashes and apostrophes',
   })
   newName: string;
 }

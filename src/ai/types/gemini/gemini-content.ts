@@ -1,5 +1,5 @@
 import { GeminiPart } from './gemini-part';
 
-export class GeminiContent{
+export class GeminiContent {
   parts: GeminiPart[];
 }

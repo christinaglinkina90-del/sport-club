@@ -3,16 +3,13 @@ import { AiChatRequestDto } from './dto/ai-chat-request.dto';
 import { Public } from '../auth/types/auth.decorators';
 import { AiService } from './ai.service';
 
-
 @Controller('ai')
 export class AiController {
   constructor(private readonly service: AiService) {}
 
-
   @Public()
-  @Post( 'chat')
+  @Post('chat')
   async askAi(@Body() chatRequestDto: AiChatRequestDto): Promise<string> {
     return this.service.generateResponse(chatRequestDto);
   }
-
 }

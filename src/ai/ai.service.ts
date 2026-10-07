@@ -4,7 +4,7 @@ import { GeminiPart } from './types/gemini/gemini-part';
 import { GeminiContent } from './types/gemini/gemini-content';
 import { GeminiChatRequest } from './types/gemini/gemini-chat-request';
 import { GeminiClient } from './clients/gemini.client';
-import { text } from 'node:stream/consumers';
+
 import { GeminiEmbedRequest } from './types/gemini/gemini-embed-request';
 import { GeminiEmbedContentConfig } from './types/gemini/gemini-embed-content-config';
 
@@ -22,12 +22,9 @@ export class AiService {
     request.contents = [content];
 
     return this.client.generateContent(request);
-
-
-
   }
-  async generateEmbeddings(texts: string []) : Promise<number[][]> {
-    const parts:GeminiPart[] = this.convertTextsToPart(texts);
+  async generateEmbeddings(texts: string[]): Promise<number[][]> {
+    const parts: GeminiPart[] = this.convertTextsToPart(texts);
     const result: number[][] = [];
     for (const part of parts) {
       const content: GeminiContent = new GeminiContent();
@@ -39,18 +36,15 @@ export class AiService {
 
       const embeding: number[] = await this.client.generateEmbedding(request);
       result.push(embeding);
-
     }
     return result;
-
   }
 
-  private convertTextsToPart(texts:string[]): GeminiPart [] {
-  return texts.map((t: string): GeminiPart => {
-    const part: GeminiPart = new GeminiPart();
-    part.text = t;
-    return part;
-  })
+  private convertTextsToPart(texts: string[]): GeminiPart[] {
+    return texts.map((t: string): GeminiPart => {
+      const part: GeminiPart = new GeminiPart();
+      part.text = t;
+      return part;
+    });
   }
 }
-

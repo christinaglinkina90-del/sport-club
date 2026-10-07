@@ -7,9 +7,8 @@ export class EmbeddingsController {
   @Public()
   @Post()
   async generateEmbeddings(
-    @Body() requestDto: CreateEmbeddingsRequestDTO,): Promise <void>{
-
+    @Body() requestDto: CreateEmbeddingsRequestDTO,
+  ): Promise<void> {
     return;
-
   }
 }

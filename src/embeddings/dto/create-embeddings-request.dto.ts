@@ -1,3 +1,3 @@
 export class CreateEmbeddingsRequestDTO {
-  texts: string [];
+  texts: string[];
 }

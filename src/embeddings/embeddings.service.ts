@@ -5,7 +5,5 @@ import { CreateEmbeddingsRequestDTO } from './dto/create-embeddings-request.dto'
 export class EmbeddingsService {
   async generateEmbeddings(
     requestDto: CreateEmbeddingsRequestDTO,
-  ): Promise<void> {
-
-  }
+  ): Promise<void> {}
 }

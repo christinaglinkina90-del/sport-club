@@ -4,36 +4,40 @@ import { UserUpdateDto } from '../dto/user.update-dto';
 
 @Injectable()
 export class UsersValidator {
-  validateSaveDto( saveDto: UserSaveDto): void {
+  validateSaveDto(saveDto: UserSaveDto): void {
     if (!saveDto) {
-      throw Error
+      throw Error();
     }
 
     const email: string = saveDto.email.trim();
     if (!email || !email.includes('@') || !email.includes('.')) {
-      throw Error ();
+      throw Error();
     }
+
     const password: string = saveDto.password.trim();
     if (!password || password.length < 8 || password.length > 20) {
-      throw Error ();
+      throw Error();
     }
+
     const name: string = saveDto.name.trim();
-    if (!name || name.length < 2 || name.length > 30 ) {
-      throw Error ();
+    if (!name || name.length < 2 || name.length > 30) {
+      throw Error();
     }
+
     const phone: string = saveDto.phone.trim();
-    if (!phone || phone.length < 2 || phone.length > 30 ) {
+    if (!phone || phone.length < 7 || phone.length > 16) {
       throw Error();
     }
   }
-  validateUpdateDto(upDateDto: UserUpdateDto): void {
-    if (!upDateDto) {
-      throw Error()
-    }
-    const name: string = upDateDto.newName.trim();
-    if (!name || name.length < 2 || name.length > 30 ) {
-      throw Error ();
+
+  validateUpdateDto(updateDto: UserUpdateDto): void {
+    if (!updateDto) {
+      throw Error();
     }
 
+    const name: string = updateDto.newName.trim();
+    if (!name || name.length < 2 || name.length > 30) {
+      throw Error();
+    }
   }
 }
