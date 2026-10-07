@@ -10,6 +10,11 @@ import { UsersValidator } from './validation/users.validator';
 import { EntitySaveException } from '../exceptions/types/entity-save.exception';
 import { EntityNotFoundException } from '../exceptions/types/entity-not-found.exception';
 import { EntityUpdateException } from '../exceptions/types/entity-update.exception';
+import { UserIsNotConfirmedException } from '../exceptions/types/user-is-not-confirmed.exception';
+import * as bcrypt from 'bcrypt';
+import { RegistrationException } from '../exceptions/types/registration.exception';
+import { EmailService } from '../email/email.service';
+import { ConfirmationCodesService } from '../confirmation-codes/confirmation-codes.service';
 
 @Injectable()
 export class UsersService {
@@ -19,6 +24,8 @@ export class UsersService {
     private readonly repository: UsersRepository,
     private readonly mapper: UsersMapper,
     private readonly validator: UsersValidator,
+    private readonly emailService: EmailService,
+    private readonly confirmationCodesService: ConfirmationCodesService,
   ) {}
 
   async create(saveDto: UserSaveDto): Promise<UserDto> {
@@ -32,6 +39,7 @@ export class UsersService {
 
     this.validator.validateSaveDto(saveDto);
     const entity: User = this.mapper.mapDtoToEntity(saveDto);
+    entity.password = await bcrypt.hash(entity.password, 10);
     entity.role = Role.CLIENT;
     entity.active = true;
     await this.repository.save(entity);
@@ -114,5 +122,63 @@ export class UsersService {
     await this.repository.save(user);
 
     this.logger.log(`User updated: id ${id}, new role ${role}`);
+  }
+
+  async getConfirmedByEmail(email: string): Promise<User> {
+    const user: User | null = await this.repository.findByEmail(email);
+
+    if (!user) {
+      throw new EntityNotFoundException(User.name, undefined, email);
+    }
+
+    if (!user.active) {
+      throw new UserIsNotConfirmedException(email);
+    }
+
+    return user;
+  }
+
+  async register(registrationDto: UserSaveDto): Promise<void> {
+    const email: string = registrationDto.email;
+    let user: User | null = await this.repository.findByEmail(email);
+
+    if (!user) {
+      user = new User();
+      user.email = email;
+      user.role = Role.CLIENT;
+      user.active = false;
+    } else if (user.active) {
+      throw new RegistrationException(`Email ${email} already in use`);
+    }
+
+    const phoneOwner: User | null = await this.repository.findByPhone(
+      registrationDto.phone,
+    );
+
+    if (phoneOwner && phoneOwner.email !== email) {
+      throw new RegistrationException(
+        `Phone ${registrationDto.phone} already in use`,
+      );
+    }
+
+    user.password = await bcrypt.hash(registrationDto.password, 10);
+    user.name = registrationDto.name;
+    user.phone = registrationDto.phone;
+
+    await this.repository.save(user);
+
+    this.logger.log(`User registered: id ${user.id}, email ${user.email}`);
+
+    await this.emailService.sendConfirmationEmail(user);
+  }
+
+  async confirmRegistration(codeValue: string): Promise<void> {
+    const user: User =
+      await this.confirmationCodesService.validateCodeAndGetUser(codeValue);
+
+    user.active = true;
+    await this.repository.save(user);
+
+    this.logger.log(`User confirmed: id ${user.id}, email ${user.email}`);
   }
 }

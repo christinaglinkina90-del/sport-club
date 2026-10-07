@@ -11,6 +11,12 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AiModule } from './ai/ai.module';
 import { EmbeddingsModule } from './embeddings/embeddings.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth/guards/auth.guard';
+import { AuthModule } from './auth/auth.module';
+import { RolesGuard } from './auth/guards/roles.guard';
+import { ConfirmationCodesModule } from './confirmation-codes/confirmation-codes.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -22,6 +28,9 @@ import { EmbeddingsModule } from './embeddings/embeddings.module';
     BookingsModule,
     PaymentsModule,
     NewsModule,
+    AuthModule,
+    ConfirmationCodesModule,
+    EmailModule,
     AiModule,
     EmbeddingsModule,
     TypeOrmModule.forRootAsync({
@@ -48,6 +57,15 @@ import { EmbeddingsModule } from './embeddings/embeddings.module';
     }),
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

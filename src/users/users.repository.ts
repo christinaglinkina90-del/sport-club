@@ -33,4 +33,12 @@ export class UsersRepository {
   async isPhoneExists(phone: string): Promise<boolean> {
     return this.repository.existsBy({ phone });
   }
+
+  async findByEmail(email: string): Promise<User | null> {
+    return this.repository.findOneBy({ email });
+  }
+
+  async findByPhone(phone: string): Promise<User | null> {
+    return this.repository.findOneBy({ phone });
+  }
 }
