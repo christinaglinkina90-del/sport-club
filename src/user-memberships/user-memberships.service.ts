@@ -43,6 +43,7 @@ export class UserMembershipsService {
       saveDto.membershipId,
     );
 
+    entity.active = true;
     await this.repository.save(entity);
 
     this.logger.log(
@@ -52,8 +53,9 @@ export class UserMembershipsService {
     return this.mapper.mapEntityToDto(entity);
   }
 
-  async getAllUserMemberships(): Promise<UserMembershipDto[]> {
-    const userMemberships: UserMembership[] = await this.repository.findAll();
+  async getAllActiveUserMemberships(): Promise<UserMembershipDto[]> {
+    const userMemberships: UserMembership[] =
+      await this.repository.findAllActive();
 
     if (userMemberships.length === 0) {
       throw new EntityNotFoundException(UserMembership.name);
@@ -62,16 +64,16 @@ export class UserMembershipsService {
     return this.mapper.mapEntityListToDtoList(userMemberships);
   }
 
-  async getUserMembershipById(id: number): Promise<UserMembershipDto> {
-    const userMembership: UserMembership = await this.getEntityById(id);
+  async getActiveUserMembershipById(id: number): Promise<UserMembershipDto> {
+    const userMembership: UserMembership = await this.getActiveEntityById(id);
     return this.mapper.mapEntityToDto(userMembership);
   }
 
-  private async getEntityById(id: number): Promise<UserMembership> {
+  private async getActiveEntityById(id: number): Promise<UserMembership> {
     const userMembership: UserMembership | null =
       await this.repository.findById(id);
 
-    if (!userMembership) {
+    if (!userMembership || !userMembership.active) {
       throw new EntityNotFoundException(UserMembership.name, id);
     }
 
@@ -79,7 +81,7 @@ export class UserMembershipsService {
   }
 
   async setStatus(id: number, status: MembershipStatus): Promise<void> {
-    const userMembership: UserMembership = await this.getEntityById(id);
+    const userMembership: UserMembership = await this.getActiveEntityById(id);
 
     if (userMembership.status === status) {
       throw new EntityUpdateException(
@@ -94,9 +96,26 @@ export class UserMembershipsService {
   }
 
   async deleteById(id: number): Promise<void> {
-    await this.getEntityById(id);
-    await this.repository.deleteById(id);
+    const userMembership: UserMembership = await this.getActiveEntityById(id);
+    userMembership.active = false;
+    await this.repository.save(userMembership);
 
-    this.logger.log(`UserMembership deleted: id ${id}`);
+    this.logger.log(`UserMembership marked as inactive: id ${id}`);
+  }
+
+  async restoreById(id: number): Promise<void> {
+    const userMembership: UserMembership | null =
+      await this.repository.findById(id);
+
+    if (!userMembership) {
+      throw new EntityNotFoundException(UserMembership.name, id);
+    }
+
+    if (!userMembership.active) {
+      userMembership.active = true;
+      await this.repository.save(userMembership);
+
+      this.logger.log(`UserMembership marked as active: id ${id}`);
+    }
   }
 }

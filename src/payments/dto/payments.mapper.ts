@@ -11,7 +11,7 @@ export class PaymentsMapper {
     const dto: PaymentDto = new PaymentDto();
     dto.id = entity.id;
     dto.user = this.usersMapper.mapEntityToDto(entity.user);
-    dto.amount = Number(entity.amount);
+    dto.amount = entity.amountInCents / 100;
     dto.type = entity.type;
     dto.status = entity.status;
     dto.createdAt = entity.createdAt;

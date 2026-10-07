@@ -33,6 +33,8 @@ export class BookingsService {
     );
 
     entity.status = BookingStatus.PENDING;
+    entity.createdAt = new Date();
+    entity.active = true;
     await this.repository.save(entity);
 
     this.logger.log(
@@ -42,8 +44,8 @@ export class BookingsService {
     return this.mapper.mapEntityToDto(entity);
   }
 
-  async getAllBookings(): Promise<BookingDto[]> {
-    const bookings: Booking[] = await this.repository.findAll();
+  async getAllActiveBookings(): Promise<BookingDto[]> {
+    const bookings: Booking[] = await this.repository.findAllActive();
 
     if (bookings.length === 0) {
       throw new EntityNotFoundException(Booking.name);
@@ -52,15 +54,15 @@ export class BookingsService {
     return this.mapper.mapEntityListToDtoList(bookings);
   }
 
-  async getBookingById(id: number): Promise<BookingDto> {
-    const booking: Booking = await this.getEntityById(id);
+  async getActiveBookingById(id: number): Promise<BookingDto> {
+    const booking: Booking = await this.getActiveEntityById(id);
     return this.mapper.mapEntityToDto(booking);
   }
 
-  async getEntityById(id: number): Promise<Booking> {
+  async getActiveEntityById(id: number): Promise<Booking> {
     const booking: Booking | null = await this.repository.findById(id);
 
-    if (!booking) {
+    if (!booking || !booking.active) {
       throw new EntityNotFoundException(Booking.name, id);
     }
 
@@ -68,7 +70,7 @@ export class BookingsService {
   }
 
   async setStatus(id: number, status: BookingStatus): Promise<void> {
-    const booking: Booking = await this.getEntityById(id);
+    const booking: Booking = await this.getActiveEntityById(id);
 
     if (booking.status === status) {
       throw new EntityUpdateException(
@@ -83,9 +85,25 @@ export class BookingsService {
   }
 
   async deleteById(id: number): Promise<void> {
-    await this.getEntityById(id);
-    await this.repository.deleteById(id);
+    const booking: Booking = await this.getActiveEntityById(id);
+    booking.active = false;
+    await this.repository.save(booking);
 
-    this.logger.log(`Booking deleted: id ${id}`);
+    this.logger.log(`Booking marked as inactive: id ${id}`);
+  }
+
+  async restoreById(id: number): Promise<void> {
+    const booking: Booking | null = await this.repository.findById(id);
+
+    if (!booking) {
+      throw new EntityNotFoundException(Booking.name, id);
+    }
+
+    if (!booking.active) {
+      booking.active = true;
+      await this.repository.save(booking);
+
+      this.logger.log(`Booking marked as active: id ${id}`);
+    }
   }
 }

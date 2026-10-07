@@ -14,8 +14,9 @@ export class PaymentsRepository {
     return this.repository.save(payment);
   }
 
-  async findAll(): Promise<Payment[]> {
+  async findAllActive(): Promise<Payment[]> {
     return this.repository.find({
+      where: { active: true },
       relations: {
         user: true,
       },

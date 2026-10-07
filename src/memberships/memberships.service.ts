@@ -26,7 +26,7 @@ export class MembershipsService {
 
     this.validator.validateSaveDto(saveDto);
     const entity: Membership = this.mapper.mapDtoToEntity(saveDto);
-    entity.isActive = true;
+    entity.active = true;
     await this.repository.save(entity);
 
     this.logger.log(
@@ -54,7 +54,7 @@ export class MembershipsService {
   async getActiveEntityById(id: number): Promise<Membership> {
     const membership: Membership | null = await this.repository.findById(id);
 
-    if (!membership || !membership.isActive) {
+    if (!membership || !membership.active) {
       throw new EntityNotFoundException(Membership.name, id);
     }
 
@@ -79,7 +79,7 @@ export class MembershipsService {
 
   async deleteById(id: number): Promise<void> {
     const membership: Membership = await this.getActiveEntityById(id);
-    membership.isActive = false;
+    membership.active = false;
     await this.repository.save(membership);
 
     this.logger.log(`Membership marked as inactive: id ${id}`);
@@ -92,8 +92,8 @@ export class MembershipsService {
       throw new EntityNotFoundException(Membership.name, id);
     }
 
-    if (!membership.isActive) {
-      membership.isActive = true;
+    if (!membership.active) {
+      membership.active = true;
       await this.repository.save(membership);
 
       this.logger.log(`Membership marked as active: id ${id}`);

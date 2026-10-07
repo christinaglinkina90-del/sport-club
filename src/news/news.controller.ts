@@ -39,7 +39,7 @@ export class NewsController {
     isArray: true,
   })
   async getAll(): Promise<NewsDto[]> {
-    return this.service.getAllNews();
+    return this.service.getAllActiveNews();
   }
 
   @Roles(Role.ADMIN, Role.TRAINER)
@@ -48,7 +48,7 @@ export class NewsController {
     type: NewsDto,
   })
   async getById(@Param('id', ParseIntPipe) id: number): Promise<NewsDto> {
-    return this.service.getNewsById(id);
+    return this.service.getActiveNewsById(id);
   }
 
   @Roles(Role.ADMIN)
@@ -66,5 +66,12 @@ export class NewsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.service.deleteById(id);
+  }
+
+  @Roles(Role.ADMIN)
+  @Patch(':id/restore')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async restoreById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.service.restoreById(id);
   }
 }

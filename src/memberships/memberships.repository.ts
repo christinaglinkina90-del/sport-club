@@ -16,7 +16,7 @@ export class MembershipsRepository {
   }
 
   async findAllActive(): Promise<Membership[]> {
-    return this.repository.findBy({ isActive: true });
+    return this.repository.findBy({ active: true });
   }
 
   async findById(id: number): Promise<Membership | null> {

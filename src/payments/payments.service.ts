@@ -46,12 +46,12 @@ export class PaymentsService {
 
     const entity: Payment = await this.createPayment(
       user,
-      Number(membership.price),
+      membership.priceInCents,
       PaymentType.MEMBERSHIP,
     );
 
     this.logger.log(
-      `Payment created: id ${entity.id}, user id ${user.id}, membership id ${membership.id}, amount ${entity.amount}`,
+      `Payment created: id ${entity.id}, user id ${user.id}, membership id ${membership.id}, amount in cents ${entity.amountInCents}`,
     );
 
     return this.mapper.mapEntityToDto(entity);
@@ -70,12 +70,12 @@ export class PaymentsService {
 
     const entity: Payment = await this.createPayment(
       user,
-      Number(service.price),
+      service.priceInCents,
       PaymentType.SERVICE,
     );
 
     this.logger.log(
-      `Payment created: id ${entity.id}, user id ${user.id}, service id ${service.id}, amount ${entity.amount}`,
+      `Payment created: id ${entity.id}, user id ${user.id}, service id ${service.id}, amount in cents ${entity.amountInCents}`,
     );
 
     return this.mapper.mapEntityToDto(entity);
@@ -88,7 +88,7 @@ export class PaymentsService {
     const user: User = await this.usersService.getActiveEntityById(
       saveDto.userId,
     );
-    const booking: Booking = await this.bookingsService.getEntityById(
+    const booking: Booking = await this.bookingsService.getActiveEntityById(
       saveDto.bookingId,
     );
 
@@ -100,12 +100,12 @@ export class PaymentsService {
 
     const entity: Payment = await this.createPayment(
       user,
-      Number(booking.schedule.service.price),
+      booking.schedule.service.priceInCents,
       PaymentType.SINGLE_VISIT,
     );
 
     this.logger.log(
-      `Payment created: id ${entity.id}, user id ${user.id}, booking id ${booking.id}, amount ${entity.amount}`,
+      `Payment created: id ${entity.id}, user id ${user.id}, booking id ${booking.id}, amount in cents ${entity.amountInCents}`,
     );
 
     return this.mapper.mapEntityToDto(entity);
@@ -113,19 +113,21 @@ export class PaymentsService {
 
   private async createPayment(
     user: User,
-    amount: number,
+    amountInCents: number,
     type: PaymentType,
   ): Promise<Payment> {
     const entity: Payment = new Payment();
     entity.user = user;
-    entity.amount = amount;
+    entity.amountInCents = amountInCents;
     entity.type = type;
     entity.status = PaymentStatus.PENDING;
+    entity.createdAt = new Date();
+    entity.active = true;
     return this.repository.save(entity);
   }
 
-  async getAllPayments(): Promise<PaymentDto[]> {
-    const payments: Payment[] = await this.repository.findAll();
+  async getAllActivePayments(): Promise<PaymentDto[]> {
+    const payments: Payment[] = await this.repository.findAllActive();
 
     if (payments.length === 0) {
       throw new EntityNotFoundException(Payment.name);
@@ -134,15 +136,15 @@ export class PaymentsService {
     return this.mapper.mapEntityListToDtoList(payments);
   }
 
-  async getPaymentById(id: number): Promise<PaymentDto> {
-    const payment: Payment = await this.getEntityById(id);
+  async getActivePaymentById(id: number): Promise<PaymentDto> {
+    const payment: Payment = await this.getActiveEntityById(id);
     return this.mapper.mapEntityToDto(payment);
   }
 
-  private async getEntityById(id: number): Promise<Payment> {
+  private async getActiveEntityById(id: number): Promise<Payment> {
     const payment: Payment | null = await this.repository.findById(id);
 
-    if (!payment) {
+    if (!payment || !payment.active) {
       throw new EntityNotFoundException(Payment.name, id);
     }
 
@@ -150,7 +152,7 @@ export class PaymentsService {
   }
 
   async setStatus(id: number, status: PaymentStatus): Promise<void> {
-    const payment: Payment = await this.getEntityById(id);
+    const payment: Payment = await this.getActiveEntityById(id);
 
     if (payment.status === status) {
       throw new EntityUpdateException(
@@ -165,9 +167,25 @@ export class PaymentsService {
   }
 
   async deleteById(id: number): Promise<void> {
-    await this.getEntityById(id);
-    await this.repository.deleteById(id);
+    const payment: Payment = await this.getActiveEntityById(id);
+    payment.active = false;
+    await this.repository.save(payment);
 
-    this.logger.log(`Payment deleted: id ${id}`);
+    this.logger.log(`Payment marked as inactive: id ${id}`);
+  }
+
+  async restoreById(id: number): Promise<void> {
+    const payment: Payment | null = await this.repository.findById(id);
+
+    if (!payment) {
+      throw new EntityNotFoundException(Payment.name, id);
+    }
+
+    if (!payment.active) {
+      payment.active = true;
+      await this.repository.save(payment);
+
+      this.logger.log(`Payment marked as active: id ${id}`);
+    }
   }
 }

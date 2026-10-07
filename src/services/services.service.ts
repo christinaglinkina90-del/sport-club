@@ -26,7 +26,7 @@ export class ServicesService {
 
     this.validator.validateSaveDto(saveDto);
     const entity: Service = this.mapper.mapDtoToEntity(saveDto);
-    entity.isActive = true;
+    entity.active = true;
     await this.repository.save(entity);
 
     this.logger.log(`Service created: id ${entity.id}, name ${entity.name}`);
@@ -52,7 +52,7 @@ export class ServicesService {
   async getActiveEntityById(id: number): Promise<Service> {
     const service: Service | null = await this.repository.findById(id);
 
-    if (!service || !service.isActive) {
+    if (!service || !service.active) {
       throw new EntityNotFoundException(Service.name, id);
     }
 
@@ -77,7 +77,7 @@ export class ServicesService {
 
   async deleteById(id: number): Promise<void> {
     const service: Service = await this.getActiveEntityById(id);
-    service.isActive = false;
+    service.active = false;
     await this.repository.save(service);
 
     this.logger.log(`Service marked as inactive: id ${id}`);
@@ -90,8 +90,8 @@ export class ServicesService {
       throw new EntityNotFoundException(Service.name, id);
     }
 
-    if (!service.isActive) {
-      service.isActive = true;
+    if (!service.active) {
+      service.active = true;
       await this.repository.save(service);
 
       this.logger.log(`Service marked as active: id ${id}`);

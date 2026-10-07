@@ -43,7 +43,7 @@ export class SchedulesService {
       saveDto.serviceId,
     );
 
-    entity.isActive = true;
+    entity.active = true;
     await this.repository.save(entity);
 
     this.logger.log(
@@ -71,7 +71,7 @@ export class SchedulesService {
   async getActiveEntityById(id: number): Promise<Schedule> {
     const schedule: Schedule | null = await this.repository.findById(id);
 
-    if (!schedule || !schedule.isActive) {
+    if (!schedule || !schedule.active) {
       throw new EntityNotFoundException(Schedule.name, id);
     }
 
@@ -113,7 +113,7 @@ export class SchedulesService {
 
   async deleteById(id: number): Promise<void> {
     const schedule: Schedule = await this.getActiveEntityById(id);
-    schedule.isActive = false;
+    schedule.active = false;
     await this.repository.save(schedule);
 
     this.logger.log(`Schedule marked as inactive: id ${id}`);
@@ -126,8 +126,8 @@ export class SchedulesService {
       throw new EntityNotFoundException(Schedule.name, id);
     }
 
-    if (!schedule.isActive) {
-      schedule.isActive = true;
+    if (!schedule.active) {
+      schedule.active = true;
       await this.repository.save(schedule);
 
       this.logger.log(`Schedule marked as active: id ${id}`);

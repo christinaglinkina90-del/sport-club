@@ -1,3 +1,5 @@
+import { Service } from '../services/service.entity';
+import { User } from '../users/user.entity';
 import {
   Column,
   Entity,
@@ -5,34 +7,36 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Service } from '../services/service.entity';
-import { User } from '../users/user.entity';
 
 @Entity('schedules')
 export class Schedule {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
-  @ManyToOne(() => Service, { nullable: false })
-  @JoinColumn({ name: 'service_id' })
+  @ManyToOne((): typeof Service => Service, { nullable: false })
+  @JoinColumn({
+    name: 'service_id',
+  })
   service: Service;
 
-  @ManyToOne(() => User, { nullable: false })
-  @JoinColumn({ name: 'trainer_id' })
+  @ManyToOne((): typeof User => User, { nullable: false })
+  @JoinColumn({
+    name: 'trainer_id',
+  })
   trainer: User;
 
-  @Column({ name: 'date', type: 'date', nullable: false })
+  @Column({ name: 'date', nullable: false, unique: false, type: 'date' })
   date: Date;
 
-  @Column({ name: 'startTime', type: 'time', nullable: false })
+  @Column({ name: 'start_time', nullable: false, unique: false, type: 'time' })
   startTime: string;
 
-  @Column({ name: 'endTime', type: 'time', nullable: false })
+  @Column({ name: 'end_time', nullable: false, unique: false, type: 'time' })
   endTime: string;
 
-  @Column({ name: 'capacity', type: 'int', nullable: false })
+  @Column({ name: 'capacity', nullable: false, unique: false })
   capacity: number;
 
-  @Column({ name: 'isActive', nullable: false, default: true })
-  isActive: boolean;
+  @Column({ name: 'active', nullable: false, unique: false })
+  active: boolean;
 }

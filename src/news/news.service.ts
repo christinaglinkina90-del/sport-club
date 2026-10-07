@@ -21,6 +21,8 @@ export class NewsService {
   async create(saveDto: NewsSaveDto): Promise<NewsDto> {
     this.validator.validateSaveDto(saveDto);
     const entity: News = this.mapper.mapDtoToEntity(saveDto);
+    entity.createdAt = new Date();
+    entity.active = true;
     await this.repository.save(entity);
 
     this.logger.log(`News created: id ${entity.id}, title ${entity.title}`);
@@ -28,8 +30,8 @@ export class NewsService {
     return this.mapper.mapEntityToDto(entity);
   }
 
-  async getAllNews(): Promise<NewsDto[]> {
-    const news: News[] = await this.repository.findAll();
+  async getAllActiveNews(): Promise<NewsDto[]> {
+    const news: News[] = await this.repository.findAllActive();
 
     if (news.length === 0) {
       throw new EntityNotFoundException(News.name);
@@ -38,15 +40,15 @@ export class NewsService {
     return this.mapper.mapEntityListToDtoList(news);
   }
 
-  async getNewsById(id: number): Promise<NewsDto> {
-    const news: News = await this.getEntityById(id);
+  async getActiveNewsById(id: number): Promise<NewsDto> {
+    const news: News = await this.getActiveEntityById(id);
     return this.mapper.mapEntityToDto(news);
   }
 
-  private async getEntityById(id: number): Promise<News> {
+  private async getActiveEntityById(id: number): Promise<News> {
     const news: News | null = await this.repository.findById(id);
 
-    if (!news) {
+    if (!news || !news.active) {
       throw new EntityNotFoundException(News.name, id);
     }
 
@@ -55,7 +57,7 @@ export class NewsService {
 
   async update(id: number, updateDto: NewsUpdateDto): Promise<void> {
     this.validator.validateUpdateDto(updateDto);
-    const foundNews: News = await this.getEntityById(id);
+    const foundNews: News = await this.getActiveEntityById(id);
 
     if (updateDto.newTitle) {
       foundNews.title = updateDto.newTitle;
@@ -71,9 +73,25 @@ export class NewsService {
   }
 
   async deleteById(id: number): Promise<void> {
-    await this.getEntityById(id);
-    await this.repository.deleteById(id);
+    const news: News = await this.getActiveEntityById(id);
+    news.active = false;
+    await this.repository.save(news);
 
-    this.logger.log(`News deleted: id ${id}`);
+    this.logger.log(`News marked as inactive: id ${id}`);
+  }
+
+  async restoreById(id: number): Promise<void> {
+    const news: News | null = await this.repository.findById(id);
+
+    if (!news) {
+      throw new EntityNotFoundException(News.name, id);
+    }
+
+    if (!news.active) {
+      news.active = true;
+      await this.repository.save(news);
+
+      this.logger.log(`News marked as active: id ${id}`);
+    }
   }
 }

@@ -14,8 +14,8 @@ export class NewsRepository {
     return this.repository.save(news);
   }
 
-  async findAll(): Promise<News[]> {
-    return this.repository.find();
+  async findAllActive(): Promise<News[]> {
+    return this.repository.findBy({ active: true });
   }
 
   async findById(id: number): Promise<News | null> {

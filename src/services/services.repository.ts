@@ -15,7 +15,7 @@ export class ServicesRepository {
   }
 
   async findAllActive(): Promise<Service[]> {
-    return this.repository.findBy({ isActive: true });
+    return this.repository.findBy({ active: true });
   }
 
   async findById(id: number): Promise<Service | null> {

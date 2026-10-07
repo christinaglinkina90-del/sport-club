@@ -15,8 +15,9 @@ export class UserMembershipsRepository {
     return this.repository.save(userMembership);
   }
 
-  async findAll(): Promise<UserMembership[]> {
+  async findAllActive(): Promise<UserMembership[]> {
     return this.repository.find({
+      where: { active: true },
       relations: {
         user: true,
         membership: true,
@@ -45,6 +46,7 @@ export class UserMembershipsRepository {
   ): Promise<boolean> {
     return this.repository.existsBy({
       user: { id: userId },
+      active: true,
       status: Not(MembershipStatus.CANCELLED),
       startDate: LessThanOrEqual(endDate),
       endDate: MoreThanOrEqual(startDate),

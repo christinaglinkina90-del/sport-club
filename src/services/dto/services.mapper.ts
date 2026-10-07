@@ -10,7 +10,7 @@ export class ServicesMapper {
     entity.name = saveDto.name;
     entity.type = saveDto.type;
     entity.description = saveDto.description;
-    entity.price = saveDto.price;
+    entity.priceInCents = Math.round(saveDto.price * 100);
     return entity;
   }
 
@@ -20,7 +20,7 @@ export class ServicesMapper {
     dto.name = entity.name;
     dto.type = entity.type;
     dto.description = entity.description;
-    dto.price = Number(entity.price);
+    dto.price = entity.priceInCents / 100;
     return dto;
   }
 

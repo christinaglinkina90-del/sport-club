@@ -1,6 +1,6 @@
+import { MembershipStatus } from './enums/membership-status.enum';
 import { User } from '../users/user.entity';
 import { Membership } from '../memberships/membership.entity';
-import { MembershipStatus } from './enums/membership-status.enum';
 import {
   Column,
   Entity,
@@ -13,20 +13,33 @@ import {
 export class UserMembership {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
-  @ManyToOne((): typeof User => User)
+
+  @ManyToOne((): typeof User => User, { nullable: false })
   @JoinColumn({
-    name: 'userId',
+    name: 'user_id',
   })
   user: User;
-  @ManyToOne((): typeof Membership => Membership)
+
+  @ManyToOne((): typeof Membership => Membership, { nullable: false })
   @JoinColumn({
-    name: 'membershipId',
+    name: 'membership_id',
   })
   membership: Membership;
-  @Column({ nullable: false, type: 'enum', enum: MembershipStatus })
+
+  @Column({
+    name: 'status',
+    nullable: false,
+    type: 'enum',
+    enum: MembershipStatus,
+  })
   status: MembershipStatus;
-  @Column({ type: 'timestamp', nullable: false })
+
+  @Column({ name: 'start_date', nullable: false, unique: false })
   startDate: Date;
-  @Column({ type: 'timestamp', nullable: false })
+
+  @Column({ name: 'end_date', nullable: false, unique: false })
   endDate: Date;
+
+  @Column({ name: 'active', nullable: false, unique: false })
+  active: boolean;
 }

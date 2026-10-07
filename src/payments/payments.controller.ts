@@ -68,7 +68,7 @@ export class PaymentsController {
     isArray: true,
   })
   async getAll(): Promise<PaymentDto[]> {
-    return this.service.getAllPayments();
+    return this.service.getAllActivePayments();
   }
 
   @Roles(Role.ADMIN)
@@ -77,7 +77,7 @@ export class PaymentsController {
     type: PaymentDto,
   })
   async getById(@Param('id', ParseIntPipe) id: number): Promise<PaymentDto> {
-    return this.service.getPaymentById(id);
+    return this.service.getActivePaymentById(id);
   }
 
   @Roles(Role.ADMIN)
@@ -95,5 +95,12 @@ export class PaymentsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.service.deleteById(id);
+  }
+
+  @Roles(Role.ADMIN)
+  @Patch(':id/restore')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async restoreById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.service.restoreById(id);
   }
 }

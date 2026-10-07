@@ -16,7 +16,7 @@ export class SchedulesRepository {
 
   async findAllActive(): Promise<Schedule[]> {
     return this.repository.find({
-      where: { isActive: true },
+      where: { active: true },
       relations: {
         service: true,
         trainer: true,

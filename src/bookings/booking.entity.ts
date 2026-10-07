@@ -1,3 +1,6 @@
+import { BookingStatus } from './enums/booking-status.enum';
+import { User } from '../users/user.entity';
+import { Schedule } from '../schedules/schedule.entity';
 import {
   Column,
   Entity,
@@ -5,35 +8,35 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { User } from '../users/user.entity';
-import { Schedule } from '../schedules/schedule.entity';
-import { BookingStatus } from './enums/booking-status.enum';
 
 @Entity('bookings')
 export class Booking {
   @PrimaryGeneratedColumn({ name: 'id' })
   id: number;
 
-  @ManyToOne(() => User, { nullable: false })
-  @JoinColumn({ name: 'user_id' })
+  @ManyToOne((): typeof User => User, { nullable: false })
+  @JoinColumn({
+    name: 'user_id',
+  })
   user: User;
 
-  @ManyToOne(() => Schedule, { nullable: false })
-  @JoinColumn({ name: 'schedule_id' })
+  @ManyToOne((): typeof Schedule => Schedule, { nullable: false })
+  @JoinColumn({
+    name: 'schedule_id',
+  })
   schedule: Schedule;
 
   @Column({
     name: 'status',
+    nullable: false,
     type: 'enum',
     enum: BookingStatus,
-    default: BookingStatus.PENDING,
   })
   status: BookingStatus;
 
-  @Column({
-    name: 'createdAt',
-    type: 'timestamp',
-    default: () => 'CURRENT_TIMESTAMP',
-  })
+  @Column({ name: 'created_at', nullable: false, unique: false })
   createdAt: Date;
+
+  @Column({ name: 'active', nullable: false, unique: false })
+  active: boolean;
 }

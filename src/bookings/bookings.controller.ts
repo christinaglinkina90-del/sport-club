@@ -40,7 +40,7 @@ export class BookingsController {
     isArray: true,
   })
   async getAll(): Promise<BookingDto[]> {
-    return this.service.getAllBookings();
+    return this.service.getAllActiveBookings();
   }
 
   @Roles(Role.ADMIN, Role.TRAINER)
@@ -49,7 +49,7 @@ export class BookingsController {
     type: BookingDto,
   })
   async getById(@Param('id', ParseIntPipe) id: number): Promise<BookingDto> {
-    return this.service.getBookingById(id);
+    return this.service.getActiveBookingById(id);
   }
 
   @Roles(Role.ADMIN, Role.TRAINER)
@@ -67,5 +67,12 @@ export class BookingsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.service.deleteById(id);
+  }
+
+  @Roles(Role.ADMIN)
+  @Patch(':id/restore')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async restoreById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.service.restoreById(id);
   }
 }

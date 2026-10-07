@@ -42,7 +42,7 @@ export class UserMembershipsController {
     isArray: true,
   })
   async getAll(): Promise<UserMembershipDto[]> {
-    return this.service.getAllUserMemberships();
+    return this.service.getAllActiveUserMemberships();
   }
 
   @Roles(Role.ADMIN, Role.TRAINER)
@@ -53,7 +53,7 @@ export class UserMembershipsController {
   async getById(
     @Param('id', ParseIntPipe) id: number,
   ): Promise<UserMembershipDto> {
-    return this.service.getUserMembershipById(id);
+    return this.service.getActiveUserMembershipById(id);
   }
 
   @Roles(Role.ADMIN)
@@ -72,5 +72,12 @@ export class UserMembershipsController {
   @HttpCode(HttpStatus.NO_CONTENT)
   async deleteById(@Param('id', ParseIntPipe) id: number): Promise<void> {
     await this.service.deleteById(id);
+  }
+
+  @Roles(Role.ADMIN)
+  @Patch(':id/restore')
+  @HttpCode(HttpStatus.NO_CONTENT)
+  async restoreById(@Param('id', ParseIntPipe) id: number): Promise<void> {
+    await this.service.restoreById(id);
   }
 }

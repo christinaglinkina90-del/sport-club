@@ -14,8 +14,9 @@ export class BookingsRepository {
     return this.repository.save(booking);
   }
 
-  async findAll(): Promise<Booking[]> {
+  async findAllActive(): Promise<Booking[]> {
     return this.repository.find({
+      where: { active: true },
       relations: {
         user: true,
         schedule: {
