@@ -32,7 +32,7 @@ export class MembershipsController {
     return this.service.create(saveDto);
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER)
+  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
   @Get()
   @ApiOkResponse({
     type: MembershipDto,
@@ -42,7 +42,7 @@ export class MembershipsController {
     return this.service.getAllActiveMemberships();
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER)
+  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
   @Get(':id')
   @ApiOkResponse({
     type: MembershipDto,

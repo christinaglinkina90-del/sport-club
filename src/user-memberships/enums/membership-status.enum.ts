@@ -1,4 +1,5 @@
 export enum MembershipStatus {
+  PENDING = 'PENDING',
   ACTIVE = 'ACTIVE',
   PAUSED = 'PAUSED',
   EXPIRED = 'EXPIRED',

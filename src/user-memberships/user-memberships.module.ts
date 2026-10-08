@@ -8,6 +8,7 @@ import { UserMembershipsMapper } from './dto/user-memberships.mapper';
 import { UserMembershipsValidator } from './validation/user-memberships.validator';
 import { UsersModule } from '../users/users.module';
 import { MembershipsModule } from '../memberships/memberships.module';
+import { PaymentsModule } from '../payments/payments.module';
 
 @Module({
   controllers: [UserMembershipsController],
@@ -15,6 +16,7 @@ import { MembershipsModule } from '../memberships/memberships.module';
     TypeOrmModule.forFeature([UserMembership]),
     UsersModule,
     MembershipsModule,
+    PaymentsModule,
   ],
   providers: [
     UserMembershipsService,
