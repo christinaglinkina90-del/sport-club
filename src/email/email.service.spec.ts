@@ -12,11 +12,14 @@ describe('EmailService', (): void => {
   let service: EmailService;
   let mailerService: Mocked<MailerService>;
   let serverUrl: string;
+  let frontendUrl: string | undefined;
 
   const user: User = new User();
   user.email = 'user@test.com';
 
   beforeEach(async (): Promise<void> => {
+    frontendUrl = undefined;
+
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         EmailService,
@@ -35,6 +38,9 @@ describe('EmailService', (): void => {
         {
           provide: ConfigService,
           useValue: {
+            get: vi.fn((key: string): string | undefined =>
+              key === 'FRONTEND_URL' ? frontendUrl : undefined,
+            ),
             getOrThrow: vi.fn((key: string): string => {
               if (key === 'SERVER_URL') {
                 return serverUrl;
@@ -74,6 +80,21 @@ describe('EmailService', (): void => {
       expect.objectContaining({
         text: expect.stringContaining(
           `http://localhost:3000/users/confirm/${CODE_VALUE}`,
+        ),
+      }),
+    );
+  });
+
+  it('should send link to the frontend page when FRONTEND_URL is set', async (): Promise<void> => {
+    serverUrl = 'http://localhost:3000';
+    frontendUrl = 'http://localhost:5173/';
+
+    await service.sendConfirmationEmail(user);
+
+    expect(mailerService.sendMail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        text: expect.stringContaining(
+          `http://localhost:5173/confirm-registration/${CODE_VALUE}`,
         ),
       }),
     );
