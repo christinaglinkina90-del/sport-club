@@ -25,10 +25,13 @@ export class EmailService {
     });
   }
 
+  // SERVER_URL - внешний адрес сервера вместе с протоколом,
+  // например http://localhost:3000 или https://sport-club.ondigitalocean.app
   private buildConfirmationLink(codeValue: string): string {
-    const host: string = this.configService.getOrThrow('SERVER_HOST');
-    const port: string = this.configService.getOrThrow('SERVER_PORT');
+    const serverUrl: string = this.configService
+      .getOrThrow<string>('SERVER_URL')
+      .replace(/\/+$/, '');
 
-    return `http://${host}:${port}/users/confirm/${codeValue}`;
+    return `${serverUrl}/users/confirm/${codeValue}`;
   }
 }
