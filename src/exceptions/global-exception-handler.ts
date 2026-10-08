@@ -23,7 +23,7 @@ export class GlobalExceptionHandler implements ExceptionFilter {
     if (exception instanceof HttpException) {
       status = exception.getStatus();
       message = this.getHttpExceptionMessage(exception);
-      this.logger.warn(message);
+      this.logger.warn(Array.isArray(message) ? message.join('; ') : message);
     } else {
       this.logger.error(exception.stack);
     }
