@@ -1,17 +1,26 @@
 import { Module } from '@nestjs/common';
-import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
-import { ServicesModule } from './service/services.module';
-import { MembershipsModule } from './membership/memberships.module';
-import { UserMembershipsModule } from './user-membership/user-memberships.module';
-
-import { BookingsModule } from './booking/bookings.module';
-import { PaymentModule } from './payment/payments.module';
+import { ServicesModule } from './services/services.module';
+import { MembershipsModule } from './memberships/memberships.module';
+import { UserMembershipsModule } from './user-memberships/user-memberships.module';
+import { SchedulesModule } from './schedules/schedules.module';
+import { BookingsModule } from './bookings/bookings.module';
+import { PaymentsModule } from './payments/payments.module';
 import { NewsModule } from './news/news.module';
-import { SchedulesModule } from './schedule/schedules.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import * as trace_events from 'node:trace_events';
 import { AiModule } from './ai/ai.module';
+import { EmbeddingsModule } from './embeddings/embeddings.module';
+import { APP_GUARD } from '@nestjs/core';
+import { AuthGuard } from './auth/guards/auth.guard';
+import { AuthModule } from './auth/auth.module';
+import { RolesGuard } from './auth/guards/roles.guard';
+import { ConfirmationCodesModule } from './confirmation-codes/confirmation-codes.module';
+import { EmailModule } from './email/email.module';
+import { VectorStorageModule } from './vector-storage/vector-storage.module';
+import { IngestionModule } from './ingestion/ingestion.module';
+import { ChatModule } from './chat/chat.module';
+import { PromptsModule } from './prompts/prompts.module';
 
 @Module({
   imports: [
@@ -21,13 +30,23 @@ import { AiModule } from './ai/ai.module';
     UserMembershipsModule,
     SchedulesModule,
     BookingsModule,
-    PaymentModule,
+    PaymentsModule,
     NewsModule,
+    AuthModule,
+    ConfirmationCodesModule,
+    EmailModule,
     AiModule,
+    EmbeddingsModule,
+    VectorStorageModule,
+    IngestionModule,
+    ChatModule,
+    PromptsModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
+      inject: [ConfigService],
       useFactory: (configService: ConfigService) => {
-        const enableSsl = configService.get<string>('DB_SSL') === 'true';
+        const enableSsl: boolean =
+          configService.get<string>('DB_SSL') === 'true';
         return {
           type: 'postgres',
           host: configService.getOrThrow<string>('DB_HOST'),
@@ -37,16 +56,24 @@ import { AiModule } from './ai/ai.module';
           database: configService.getOrThrow<string>('DB_DATABASE'),
           autoLoadEntities: true,
           synchronize: true,
-          ssl: enableSsl? { rejectUnauthorized: false } : false,
+          ssl: enableSsl ? { rejectUnauthorized: false } : false,
         };
       },
-      inject: [ConfigService],
     }),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: RolesGuard,
+    },
+  ],
 })
 export class AppModule {}

@@ -34,7 +34,7 @@ export class RequestLoggingInterceptor implements NestInterceptor {
       : 'none';
 
     this.logger.debug(
-      `${className}, ${methodName} called with params: ${params} and body: ${body}`,
+      `${className}.${methodName} called with params: ${params} and body: ${body}`,
     );
 
     const startedAt: number = Date.now();

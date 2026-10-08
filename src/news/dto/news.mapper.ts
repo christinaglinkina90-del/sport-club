@@ -1,11 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { News } from '../news.entity.js';
-import { NewsDto } from './news.dto.js';
-import { NewsSaveDto } from './news.save-dto.js';
+import { NewsSaveDto } from './news.save-dto';
+import { News } from '../news.entity';
+import { NewsDto } from './news.dto';
 
 @Injectable()
 export class NewsMapper {
-
   mapDtoToEntity(saveDto: NewsSaveDto): News {
     const entity: News = new News();
     entity.title = saveDto.title;
@@ -18,7 +17,7 @@ export class NewsMapper {
     dto.id = entity.id;
     dto.title = entity.title;
     dto.content = entity.content;
-    // дату не показываем чтобы скрыть заранее запланированные новости
+    // дату не показываем, чтобы скрыть заранее запланированные новости
     return dto;
   }
 

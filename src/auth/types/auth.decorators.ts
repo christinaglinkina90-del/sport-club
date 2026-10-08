@@ -1,6 +1,5 @@
 import { CustomDecorator, SetMetadata } from '@nestjs/common';
-import { Role } from '../../users/enum/role.enum';
-
+import { Role } from '../../users/enums/role.enum';
 
 export const IS_PUBLIC_KEY: string = 'isPublic';
 

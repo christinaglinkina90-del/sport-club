@@ -1,0 +1,36 @@
+import { Injectable } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Membership } from './membership.entity';
+import { MembershipType } from './enums/membership-type.enum';
+
+@Injectable()
+export class MembershipsRepository {
+  constructor(
+    @InjectRepository(Membership)
+    private readonly repository: Repository<Membership>,
+  ) {}
+
+  async save(membership: Membership): Promise<Membership> {
+    return this.repository.save(membership);
+  }
+
+  async findAllActive(): Promise<Membership[]> {
+    return this.repository.findBy({ active: true });
+  }
+
+  async findById(id: number): Promise<Membership | null> {
+    return this.repository.findOneBy({ id });
+  }
+
+  async deleteById(id: number): Promise<void> {
+    await this.repository.delete(id);
+  }
+
+  async isNameAndTypeExists(
+    name: string,
+    type: MembershipType,
+  ): Promise<boolean> {
+    return this.repository.existsBy({ name, type });
+  }
+}

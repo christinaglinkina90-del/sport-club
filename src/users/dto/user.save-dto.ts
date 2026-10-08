@@ -1,30 +1,31 @@
-import { IsEmail, IsString, Length, Matches } from 'class-validator';
 import { ApiProperty } from '@nestjs/swagger';
+import { IsEmail, Length, Matches } from 'class-validator';
 
 export class UserSaveDto {
-  @ApiProperty()
-  @IsString()
-  @Length(2, 30)
-  @Matches(/^[A-Za-z\-' ]+$/, {
-    message: 'Name should contain only letters, spaces, dashes and apostrophes',
-  })
-  name: string;
-
   @ApiProperty()
   @IsEmail()
   email: string;
 
   @ApiProperty()
-  @IsString()
   @Length(8, 20)
   @Matches(/^(?=.*[A-Z])(?=.*[a-z])(?=.*\d).+$/, {
     message:
-      'Password must contain at least one uppercase, one lowercase and one digit',
+      'Password should contain at least one digit, one capital letter and one small letter',
   })
   password: string;
 
   @ApiProperty()
-  @IsString()
   @Length(2, 30)
+  @Matches(/^[A-Za-z\-' ]+$/, {
+    message:
+      'Name should contain only capital and small letters, spaces, dashes and apostrophes',
+  })
+  name: string;
+
+  @ApiProperty()
+  @Matches(/^\+?\d{7,15}$/, {
+    message:
+      'Phone should contain from 7 to 15 digits and may start with a plus sign',
+  })
   phone: string;
 }

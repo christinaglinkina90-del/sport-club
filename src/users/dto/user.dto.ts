@@ -1,4 +1,4 @@
-import { Role } from '../enum/role.enum';
+import { Role } from '../enums/role.enum';
 import { ApiProperty } from '@nestjs/swagger';
 
 export class UserDto {
@@ -8,6 +8,6 @@ export class UserDto {
   @ApiProperty()
   name: string;
 
-  @ApiProperty()
+  @ApiProperty({ enum: Role })
   role: Role;
 }

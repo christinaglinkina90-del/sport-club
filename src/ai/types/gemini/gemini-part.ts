@@ -1,3 +1,3 @@
-export class GeminiPart{
-  text: string
+export class GeminiPart {
+  text: string;
 }
