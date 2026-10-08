@@ -58,3 +58,5 @@ pids
 # Diagnostic reports (https://nodejs.org/api/report.html)
 report.[0-9]*.[0-9]*.[0-9]*.[0-9]*.json
 vitest.config.*
+# Demo seed script settings (contain passwords)
+scripts/seed-demo.env
