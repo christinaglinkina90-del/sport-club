@@ -17,6 +17,10 @@ import { AuthModule } from './auth/auth.module';
 import { RolesGuard } from './auth/guards/roles.guard';
 import { ConfirmationCodesModule } from './confirmation-codes/confirmation-codes.module';
 import { EmailModule } from './email/email.module';
+import { VectorStorageModule } from './vector-storage/vector-storage.module';
+import { IngestionModule } from './ingestion/ingestion.module';
+import { ChatModule } from './chat/chat.module';
+import { PromptsModule } from './prompts/prompts.module';
 
 @Module({
   imports: [
@@ -33,6 +37,10 @@ import { EmailModule } from './email/email.module';
     EmailModule,
     AiModule,
     EmbeddingsModule,
+    VectorStorageModule,
+    IngestionModule,
+    ChatModule,
+    PromptsModule,
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
