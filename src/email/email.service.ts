@@ -25,10 +25,25 @@ export class EmailService {
     });
   }
 
+  // FRONTEND_URL - адрес фронтенда, например http://localhost:5173.
+  // Если он задан, ссылка ведёт на страницу подтверждения во фронтенде.
+  // Иначе - напрямую на бэкенд по SERVER_URL, например
+  // http://localhost:3000 или https://sport-club.ondigitalocean.app
   private buildConfirmationLink(codeValue: string): string {
-    const host: string = this.configService.getOrThrow('SERVER_HOST');
-    const port: string = this.configService.getOrThrow('SERVER_PORT');
+    const frontendUrl: string | undefined =
+      this.configService.get<string>('FRONTEND_URL');
 
-    return `http://${host}:${port}/users/confirm/${codeValue}`;
+    if (frontendUrl) {
+      return `${this.trimSlashes(frontendUrl)}/confirm-registration/${codeValue}`;
+    }
+
+    const serverUrl: string =
+      this.configService.getOrThrow<string>('SERVER_URL');
+
+    return `${this.trimSlashes(serverUrl)}/users/confirm/${codeValue}`;
+  }
+
+  private trimSlashes(url: string): string {
+    return url.replace(/\/+$/, '');
   }
 }
