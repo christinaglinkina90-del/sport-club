@@ -32,7 +32,7 @@ export class SchedulesController {
     return this.service.create(saveDto);
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER)
+  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
   @Get()
   @ApiOkResponse({
     type: ScheduleDto,
@@ -42,7 +42,7 @@ export class SchedulesController {
     return this.service.getAllActiveSchedules();
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER)
+  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
   @Get(':id')
   @ApiOkResponse({
     type: ScheduleDto,

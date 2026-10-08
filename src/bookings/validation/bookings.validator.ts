@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { BookingSaveDto } from '../dto/booking.save-dto';
+import { MyBookingSaveDto } from '../dto/my-booking.save-dto';
 
 @Injectable()
 export class BookingsValidator {
@@ -10,6 +11,17 @@ export class BookingsValidator {
 
     const userId: number = saveDto.userId;
     if (!userId || userId < 1) {
+      throw Error();
+    }
+
+    const scheduleId: number = saveDto.scheduleId;
+    if (!scheduleId || scheduleId < 1) {
+      throw Error();
+    }
+  }
+
+  validateMyBookingSaveDto(saveDto: MyBookingSaveDto): void {
+    if (!saveDto) {
       throw Error();
     }
 

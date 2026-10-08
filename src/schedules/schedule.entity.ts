@@ -1,10 +1,12 @@
 import { Service } from '../services/service.entity';
 import { User } from '../users/user.entity';
+import { Booking } from '../bookings/booking.entity';
 import {
   Column,
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -39,4 +41,14 @@ export class Schedule {
 
   @Column({ name: 'active', nullable: false, unique: false })
   active: boolean;
+
+  @OneToMany(
+    (): typeof Booking => Booking,
+    (booking: Booking): Schedule => booking.schedule,
+  )
+  bookings: Booking[];
+
+  // Не колонка: количество активных неотменённых броней,
+  // заполняется в SchedulesRepository через loadRelationCountAndMap.
+  bookedCount?: number;
 }
