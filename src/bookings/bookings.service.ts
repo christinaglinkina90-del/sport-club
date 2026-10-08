@@ -14,6 +14,8 @@ import { Schedule } from '../schedules/schedule.entity';
 import { EntityNotFoundException } from '../exceptions/types/entity-not-found.exception';
 import { EntityUpdateException } from '../exceptions/types/entity-update.exception';
 import { BookingException } from '../exceptions/types/booking.exception';
+import { AccessDeniedException } from '../exceptions/types/access-denied.exception';
+import { Role } from '../users/enums/role.enum';
 
 @Injectable()
 export class BookingsService {
@@ -137,8 +139,42 @@ export class BookingsService {
     return booking;
   }
 
-  async setStatus(id: number, status: BookingStatus): Promise<void> {
+  async getBookingsOfSchedule(
+    scheduleId: number,
+    user: User,
+  ): Promise<BookingDto[]> {
+    const schedule: Schedule =
+      await this.schedulesService.getActiveEntityById(scheduleId);
+
+    this.checkCanManageSchedule(schedule, user);
+
+    // Пустой список для занятия - нормальная ситуация, поэтому без 404.
+    const bookings: Booking[] =
+      await this.repository.findAllActiveByScheduleId(scheduleId);
+
+    return this.mapper.mapEntityListToDtoList(bookings);
+  }
+
+  async setStatus(
+    id: number,
+    status: BookingStatus,
+    user: User,
+  ): Promise<void> {
     const booking: Booking = await this.getActiveEntityById(id);
+
+    this.checkCanManageSchedule(booking.schedule, user);
+
+    const isAttendance: boolean =
+      status === BookingStatus.COMPLETED || status === BookingStatus.NO_SHOW;
+
+    if (
+      isAttendance &&
+      this.toDateString(booking.schedule.date) > this.toDateString(new Date())
+    ) {
+      throw new EntityUpdateException(
+        `Attendance for booking id ${id} can be marked only on the day of the class or later`,
+      );
+    }
 
     if (booking.status === status) {
       throw new EntityUpdateException(
@@ -149,7 +185,18 @@ export class BookingsService {
     booking.status = status;
     await this.repository.save(booking);
 
-    this.logger.log(`Booking updated: id ${id}, new status ${status}`);
+    this.logger.log(
+      `Booking updated: id ${id}, new status ${status}, by user id ${user.id}`,
+    );
+  }
+
+  // Тренер управляет записями только на своих занятиях, администратор - на любых.
+  private checkCanManageSchedule(schedule: Schedule, user: User): void {
+    if (user.role === Role.TRAINER && schedule.trainer.id !== user.id) {
+      throw new AccessDeniedException(
+        `Schedule id ${schedule.id} belongs to another trainer`,
+      );
+    }
   }
 
   async cancelByCurrentUser(user: User, id: number): Promise<void> {

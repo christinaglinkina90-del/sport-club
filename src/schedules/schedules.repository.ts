@@ -38,6 +38,26 @@ export class SchedulesRepository {
     return schedules;
   }
 
+  async findAllActiveByTrainerId(trainerId: number): Promise<Schedule[]> {
+    const schedules: Schedule[] = await this.repository.find({
+      where: {
+        active: true,
+        trainer: { id: trainerId },
+      },
+      relations: {
+        service: true,
+        trainer: true,
+      },
+      order: {
+        date: 'ASC',
+        startTime: 'ASC',
+      },
+    });
+
+    await this.fillBookedCount(schedules);
+    return schedules;
+  }
+
   async findById(id: number): Promise<Schedule | null> {
     const schedule: Schedule | null = await this.repository.findOne({
       where: { id },

@@ -9,8 +9,10 @@ import {
   ParseIntPipe,
   Patch,
   Post,
+  Req,
 } from '@nestjs/common';
 import { SchedulesService } from './schedules.service';
+import type { AuthenticatedRequest } from '../auth/types/authenticated-request';
 import { ApiOkResponse } from '@nestjs/swagger';
 import { ScheduleDto } from './dto/schedule.dto';
 import { ScheduleSaveDto } from './dto/schedule.save-dto';
@@ -40,6 +42,17 @@ export class SchedulesController {
   })
   async getAll(): Promise<ScheduleDto[]> {
     return this.service.getAllActiveSchedules();
+  }
+
+  // Объявлен раньше /schedules/:id, иначе "my" попадёт в параметр :id.
+  @Roles(Role.TRAINER, Role.ADMIN)
+  @Get('my')
+  @ApiOkResponse({
+    type: ScheduleDto,
+    isArray: true,
+  })
+  async getMy(@Req() request: AuthenticatedRequest): Promise<ScheduleDto[]> {
+    return this.service.getActiveSchedulesOfTrainer(request.user);
   }
 
   @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)

@@ -28,6 +28,25 @@ export class BookingsRepository {
     });
   }
 
+  async findAllActiveByScheduleId(scheduleId: number): Promise<Booking[]> {
+    return this.repository.find({
+      where: {
+        active: true,
+        schedule: { id: scheduleId },
+      },
+      relations: {
+        user: true,
+        schedule: {
+          service: true,
+          trainer: true,
+        },
+      },
+      order: {
+        createdAt: 'ASC',
+      },
+    });
+  }
+
   async findAllActiveByUserId(userId: number): Promise<Booking[]> {
     return this.repository.find({
       where: {

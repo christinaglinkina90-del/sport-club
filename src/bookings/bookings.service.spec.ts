@@ -20,6 +20,7 @@ import { ServiceType } from '../services/enums/service-type.enum';
 import { BookingException } from '../exceptions/types/booking.exception';
 import { EntityNotFoundException } from '../exceptions/types/entity-not-found.exception';
 import { EntityUpdateException } from '../exceptions/types/entity-update.exception';
+import { AccessDeniedException } from '../exceptions/types/access-denied.exception';
 
 describe('BookingsService', (): void => {
   const TOMORROW: string = new Date(Date.now() + 24 * 60 * 60 * 1000)
@@ -89,6 +90,7 @@ describe('BookingsService', (): void => {
             save: vi.fn(async (entity: Booking): Promise<Booking> => entity),
             findById: vi.fn(),
             isActiveBookingExists: vi.fn().mockResolvedValue(false),
+            findAllActiveByScheduleId: vi.fn(),
           },
         },
         {
@@ -210,6 +212,68 @@ describe('BookingsService', (): void => {
 
       await expect(resultPromise).rejects.toThrow('cannot be cancelled');
       await expect(resultPromise).rejects.toBeInstanceOf(EntityUpdateException);
+    });
+  });
+
+  describe('trainer cabinet', (): void => {
+    let trainer: User;
+    let otherTrainer: User;
+
+    beforeEach((): void => {
+      trainer = createUser(3);
+      trainer.role = Role.TRAINER;
+      otherTrainer = createUser(4);
+      otherTrainer.role = Role.TRAINER;
+      schedule.trainer = trainer;
+    });
+
+    it('should mark attendance on own class that already took place', async (): Promise<void> => {
+      schedule.date = YESTERDAY as unknown as Date;
+
+      await service.setStatus(booking.id, BookingStatus.COMPLETED, trainer);
+
+      expect(repository.save).toHaveBeenCalledWith(
+        expect.objectContaining({
+          id: booking.id,
+          status: BookingStatus.COMPLETED,
+        }),
+      );
+    });
+
+    it('should not mark attendance for a future class', async (): Promise<void> => {
+      const resultPromise: Promise<void> = service.setStatus(
+        booking.id,
+        BookingStatus.NO_SHOW,
+        trainer,
+      );
+
+      await expect(resultPromise).rejects.toThrow('day of the class');
+      await expect(resultPromise).rejects.toBeInstanceOf(EntityUpdateException);
+    });
+
+    it('should not let a trainer change bookings of another trainer', async (): Promise<void> => {
+      const resultPromise: Promise<void> = service.setStatus(
+        booking.id,
+        BookingStatus.CONFIRMED,
+        otherTrainer,
+      );
+
+      await expect(resultPromise).rejects.toBeInstanceOf(AccessDeniedException);
+      expect(repository.save).not.toHaveBeenCalled();
+    });
+
+    it('should return participants of own class only', async (): Promise<void> => {
+      repository.findAllActiveByScheduleId.mockResolvedValue([booking]);
+
+      const result: BookingDto[] = await service.getBookingsOfSchedule(
+        schedule.id,
+        trainer,
+      );
+      expect(result.map((b: BookingDto): number => b.id)).toEqual([booking.id]);
+
+      await expect(
+        service.getBookingsOfSchedule(schedule.id, otherTrainer),
+      ).rejects.toBeInstanceOf(AccessDeniedException);
     });
   });
 });
