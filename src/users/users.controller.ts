@@ -14,6 +14,7 @@ import {
 import { Role } from './enums/role.enum';
 import { UsersService } from './users.service';
 import { UserDto } from './dto/user.dto';
+import { UserDetailsDto } from './dto/user-details.dto';
 import { UserSaveDto } from './dto/user.save-dto';
 import { UserUpdateDto } from './dto/user.update-dto';
 import { ApiOkResponse } from '@nestjs/swagger';
@@ -41,6 +42,17 @@ export class UsersController {
   })
   async getAll(): Promise<UserDto[]> {
     return this.service.getAllActiveUsers();
+  }
+
+  // Объявлен раньше /users/:id, иначе "all" попадёт в параметр :id.
+  @Roles(Role.ADMIN)
+  @Get('all')
+  @ApiOkResponse({
+    type: UserDetailsDto,
+    isArray: true,
+  })
+  async getAllWithDetails(): Promise<UserDetailsDto[]> {
+    return this.service.getAllUsersWithDetails();
   }
 
   @Roles(Role.ADMIN, Role.TRAINER)

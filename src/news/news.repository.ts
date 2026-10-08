@@ -15,7 +15,10 @@ export class NewsRepository {
   }
 
   async findAllActive(): Promise<News[]> {
-    return this.repository.findBy({ active: true });
+    return this.repository.find({
+      where: { active: true },
+      order: { createdAt: 'DESC' },
+    });
   }
 
   async findById(id: number): Promise<News | null> {

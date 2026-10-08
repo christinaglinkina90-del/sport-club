@@ -178,6 +178,31 @@ describe('UsersController (IT)', (): void => {
     });
   });
 
+  describe('getAllWithDetails', (): void => {
+    it('should return active and inactive users with contacts', async (): Promise<void> => {
+      const response: Response = await request(httpServer)
+        .get(`${RESOURCE_NAME}/all`)
+        .expect(HttpStatus.OK);
+
+      expect(response.body).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            id: activeUser.id,
+            email: activeUser.email,
+            phone: activeUser.phone,
+            active: true,
+          }),
+          expect.objectContaining({
+            id: inactiveUser.id,
+            email: inactiveUser.email,
+            active: false,
+          }),
+        ]),
+      );
+      expect(response.body[0].password).toBeUndefined();
+    });
+  });
+
   describe('getById', (): void => {
     it('should return user', async (): Promise<void> => {
       const response: Response = await request(httpServer)
