@@ -32,7 +32,7 @@ export class NewsController {
     return this.service.create(saveDto);
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER)
+  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
   @Get()
   @ApiOkResponse({
     type: NewsDto,
@@ -42,7 +42,7 @@ export class NewsController {
     return this.service.getAllActiveNews();
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER)
+  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
   @Get(':id')
   @ApiOkResponse({
     type: NewsDto,

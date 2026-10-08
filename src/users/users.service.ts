@@ -3,6 +3,7 @@ import { UsersRepository } from './users.repository';
 import { User } from './user.entity';
 import { Role } from './enums/role.enum';
 import { UserDto } from './dto/user.dto';
+import { UserDetailsDto } from './dto/user-details.dto';
 import { UsersMapper } from './dto/users.mapper';
 import { UserSaveDto } from './dto/user.save-dto';
 import { UserUpdateDto } from './dto/user.update-dto';
@@ -57,6 +58,17 @@ export class UsersService {
     }
 
     return this.mapper.mapEntityListToDtoList(users);
+  }
+
+  // Все пользователи, включая отключённых и неподтверждённых - для администратора.
+  async getAllUsersWithDetails(): Promise<UserDetailsDto[]> {
+    const users: User[] = await this.repository.findAll();
+
+    if (users.length === 0) {
+      throw new EntityNotFoundException(User.name);
+    }
+
+    return this.mapper.mapEntityListToDetailsDtoList(users);
   }
 
   async getActiveUserById(id: number): Promise<UserDto> {

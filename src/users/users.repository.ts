@@ -18,6 +18,12 @@ export class UsersRepository {
     return this.repository.findBy({ active: true });
   }
 
+  async findAll(): Promise<User[]> {
+    return this.repository.find({
+      order: { id: 'ASC' },
+    });
+  }
+
   async findById(id: number): Promise<User | null> {
     return this.repository.findOneBy({ id });
   }
