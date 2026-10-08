@@ -18,11 +18,11 @@ export class GlobalExceptionHandler implements ExceptionFilter {
     const response: any = context.getResponse();
 
     let status: HttpStatus = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message: string = 'Internal server error';
+    let message: string | string[] = 'Internal server error';
 
     if (exception instanceof HttpException) {
       status = exception.getStatus();
-      message = exception.message;
+      message = this.getHttpExceptionMessage(exception);
       this.logger.warn(message);
     } else {
       this.logger.error(exception.stack);
@@ -34,5 +34,22 @@ export class GlobalExceptionHandler implements ExceptionFilter {
       status,
       message,
     });
+  }
+
+  // ValidationPipe кладёт список ошибок полей в тело ответа исключения,
+  // а exception.message содержит только общее "Bad Request Exception".
+  private getHttpExceptionMessage(exception: HttpException): string | string[] {
+    const exceptionResponse: string | object = exception.getResponse();
+
+    if (
+      typeof exceptionResponse === 'object' &&
+      'message' in exceptionResponse &&
+      (typeof exceptionResponse.message === 'string' ||
+        Array.isArray(exceptionResponse.message))
+    ) {
+      return exceptionResponse.message as string | string[];
+    }
+
+    return exception.message;
   }
 }

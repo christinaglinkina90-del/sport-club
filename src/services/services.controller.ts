@@ -32,7 +32,7 @@ export class ServicesController {
     return this.service.create(saveDto);
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER)
+  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
   @Get()
   @ApiOkResponse({
     type: ServiceDto,
@@ -42,7 +42,7 @@ export class ServicesController {
     return this.service.getAllActiveServices();
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER)
+  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
   @Get(':id')
   @ApiOkResponse({
     type: ServiceDto,

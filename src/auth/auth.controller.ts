@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Get,
   HttpCode,
   HttpStatus,
   Post,
@@ -12,10 +13,25 @@ import { LoginRequestDto } from './dto/login-request.dto';
 import express from 'express';
 import { Public } from './types/auth.decorators';
 import { TokenResponseDto } from './dto/token-response.dto';
+import { ApiOkResponse } from '@nestjs/swagger';
+import { UserDto } from '../users/dto/user.dto';
+import { UsersMapper } from '../users/dto/users.mapper';
+import type { AuthenticatedRequest } from './types/authenticated-request';
 
 @Controller('/auth')
 export class AuthController {
-  constructor(private readonly service: AuthService) {}
+  constructor(
+    private readonly service: AuthService,
+    private readonly usersMapper: UsersMapper,
+  ) {}
+
+  @Get('/me')
+  @ApiOkResponse({
+    type: UserDto,
+  })
+  getCurrentUser(@Req() request: AuthenticatedRequest): UserDto {
+    return this.usersMapper.mapEntityToDto(request.user);
+  }
 
   @Public()
   @Post('/login')
