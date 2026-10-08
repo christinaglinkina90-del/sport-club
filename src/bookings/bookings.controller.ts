@@ -82,6 +82,19 @@ export class BookingsController {
   }
 
   @Roles(Role.ADMIN, Role.TRAINER)
+  @Get('schedule/:scheduleId')
+  @ApiOkResponse({
+    type: BookingDto,
+    isArray: true,
+  })
+  async getBySchedule(
+    @Param('scheduleId', ParseIntPipe) scheduleId: number,
+    @Req() request: AuthenticatedRequest,
+  ): Promise<BookingDto[]> {
+    return this.service.getBookingsOfSchedule(scheduleId, request.user);
+  }
+
+  @Roles(Role.ADMIN, Role.TRAINER)
   @Get(':id')
   @ApiOkResponse({
     type: BookingDto,
@@ -96,8 +109,9 @@ export class BookingsController {
   async setStatus(
     @Param('id', ParseIntPipe) id: number,
     @Param('status', new ParseEnumPipe(BookingStatus)) status: BookingStatus,
+    @Req() request: AuthenticatedRequest,
   ): Promise<void> {
-    await this.service.setStatus(id, status);
+    await this.service.setStatus(id, status, request.user);
   }
 
   @Roles(Role.ADMIN)

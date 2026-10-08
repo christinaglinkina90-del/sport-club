@@ -63,6 +63,17 @@ export class SchedulesService {
     return this.mapper.mapEntityListToDtoList(schedules);
   }
 
+  async getActiveSchedulesOfTrainer(trainer: User): Promise<ScheduleDto[]> {
+    const schedules: Schedule[] =
+      await this.repository.findAllActiveByTrainerId(trainer.id);
+
+    if (schedules.length === 0) {
+      throw new EntityNotFoundException(Schedule.name);
+    }
+
+    return this.mapper.mapEntityListToDtoList(schedules);
+  }
+
   async getActiveScheduleById(id: number): Promise<ScheduleDto> {
     const schedule: Schedule = await this.getActiveEntityById(id);
     return this.mapper.mapEntityToDto(schedule);
