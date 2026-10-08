@@ -10,9 +10,10 @@ import {
 import { Roles } from '../auth/types/auth.decorators';
 import { Role } from '../users/enums/role.enum';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { ApiBody, ApiConsumes } from '@nestjs/swagger';
+import { ApiBody, ApiConsumes, ApiOkResponse } from '@nestjs/swagger';
 import { IngestionService } from './ingestion.service';
 import { IngestDocumentDto } from './dto/ingest-document.dto';
+import { IngestResultDto } from './dto/ingest-result.dto';
 
 @Controller('ingestion')
 export class IngestionController {
@@ -36,10 +37,13 @@ export class IngestionController {
       },
     },
   })
+  @ApiOkResponse({
+    type: IngestResultDto,
+  })
   async upload(
     @UploadedFile() file: Express.Multer.File,
     @Body() ingestDocumentDto: IngestDocumentDto,
-  ): Promise<void> {
-    await this.service.ingest(file, ingestDocumentDto);
+  ): Promise<IngestResultDto> {
+    return this.service.ingest(file, ingestDocumentDto);
   }
 }

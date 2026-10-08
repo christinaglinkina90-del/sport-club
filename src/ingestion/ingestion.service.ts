@@ -10,6 +10,8 @@ import { AiService } from '../ai/ai.service';
 import { Repository } from 'typeorm';
 import { QuarantineDocument } from './quarantine-document.entity';
 import { InjectRepository } from '@nestjs/typeorm';
+import { IngestResultDto } from './dto/ingest-result.dto';
+import { IngestStatus } from './enums/ingest-status.enum';
 
 @Injectable()
 export class IngestionService {
@@ -30,8 +32,11 @@ export class IngestionService {
   async ingest(
     file: Express.Multer.File,
     ingestDocumentDto: IngestDocumentDto,
-  ): Promise<void> {
+  ): Promise<IngestResultDto> {
     const pages: string[] = await this.multiformatExtractor.extract(file);
+
+    const result: IngestResultDto = new IngestResultDto();
+    result.documentId = ingestDocumentDto.documentId;
 
     const prompt: string = this.promptService
       .buildPromptForDocumentSafetyDetermination()
@@ -56,6 +61,9 @@ export class IngestionService {
       this.logger.log(
         `Document ingested: id ${ingestDocumentDto.documentId}, version ${ingestDocumentDto.documentVersion}, chunks ${chunks.length}`,
       );
+
+      result.status = IngestStatus.INGESTED;
+      result.chunksCount = chunks.length;
     } else {
       const document: QuarantineDocument = new QuarantineDocument();
       document.documentId = ingestDocumentDto.documentId;
@@ -66,6 +74,11 @@ export class IngestionService {
       this.logger.warn(
         `Document moved to quarantine: id ${ingestDocumentDto.documentId}`,
       );
+
+      result.status = IngestStatus.QUARANTINED;
+      result.chunksCount = 0;
     }
+
+    return result;
   }
 }
