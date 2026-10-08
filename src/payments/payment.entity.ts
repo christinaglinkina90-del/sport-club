@@ -1,6 +1,7 @@
 import { PaymentType } from './enums/payment-type.enum';
 import { PaymentStatus } from './enums/payment-status.enum';
 import { User } from '../users/user.entity';
+import { UserMembership } from '../user-memberships/user-membership.entity';
 import {
   Column,
   Entity,
@@ -19,6 +20,13 @@ export class Payment {
     name: 'user_id',
   })
   user: User;
+
+  // Заполняется только для оплаты абонемента по заявке клиента.
+  @ManyToOne((): typeof UserMembership => UserMembership, { nullable: true })
+  @JoinColumn({
+    name: 'user_membership_id',
+  })
+  userMembership: UserMembership | null;
 
   @Column({ name: 'amount_in_cents', nullable: false, unique: false })
   amountInCents: number;

@@ -17,6 +17,7 @@ import { User } from '../users/user.entity';
 import { Membership } from '../memberships/membership.entity';
 import { Service } from '../services/service.entity';
 import { Booking } from '../bookings/booking.entity';
+import { UserMembership } from '../user-memberships/user-membership.entity';
 import { EntityNotFoundException } from '../exceptions/types/entity-not-found.exception';
 import { EntityUpdateException } from '../exceptions/types/entity-update.exception';
 
@@ -111,13 +112,51 @@ export class PaymentsService {
     return this.mapper.mapEntityToDto(entity);
   }
 
+  async createForUserMembership(
+    userMembership: UserMembership,
+  ): Promise<PaymentDto> {
+    const entity: Payment = await this.createPayment(
+      userMembership.user,
+      userMembership.membership.priceInCents,
+      PaymentType.MEMBERSHIP,
+      userMembership,
+    );
+
+    this.logger.log(
+      `Payment created: id ${entity.id}, user id ${userMembership.user.id}, user membership id ${userMembership.id}, amount in cents ${entity.amountInCents}`,
+    );
+
+    return this.mapper.mapEntityToDto(entity);
+  }
+
+  async setStatusForUserMembership(
+    userMembershipId: number,
+    status: PaymentStatus,
+  ): Promise<void> {
+    const payment: Payment | null =
+      await this.repository.findActiveByUserMembershipId(userMembershipId);
+
+    if (!payment) {
+      throw new EntityNotFoundException(Payment.name);
+    }
+
+    payment.status = status;
+    await this.repository.save(payment);
+
+    this.logger.log(
+      `Payment updated: id ${payment.id}, user membership id ${userMembershipId}, new status ${status}`,
+    );
+  }
+
   private async createPayment(
     user: User,
     amountInCents: number,
     type: PaymentType,
+    userMembership: UserMembership | null = null,
   ): Promise<Payment> {
     const entity: Payment = new Payment();
     entity.user = user;
+    entity.userMembership = userMembership;
     entity.amountInCents = amountInCents;
     entity.type = type;
     entity.status = PaymentStatus.PENDING;

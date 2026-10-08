@@ -1,5 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { UserMembershipSaveDto } from '../dto/user-membership.save-dto';
+import { MyUserMembershipSaveDto } from '../dto/my-user-membership.save-dto';
 import { MembershipStatus } from '../enums/membership-status.enum';
 
 @Injectable()
@@ -32,6 +33,17 @@ export class UserMembershipsValidator {
       endDate.getFullYear() - startDate.getFullYear() > 1 ||
       endDate.getTime() <= startDate.getTime()
     ) {
+      throw Error();
+    }
+  }
+
+  validateMySaveDto(saveDto: MyUserMembershipSaveDto): void {
+    if (!saveDto) {
+      throw Error();
+    }
+
+    const membershipId: number = saveDto.membershipId;
+    if (!membershipId || membershipId < 1) {
       throw Error();
     }
   }

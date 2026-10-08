@@ -35,4 +35,18 @@ export class PaymentsRepository {
   async deleteById(id: number): Promise<void> {
     await this.repository.delete(id);
   }
+
+  async findActiveByUserMembershipId(
+    userMembershipId: number,
+  ): Promise<Payment | null> {
+    return this.repository.findOne({
+      where: {
+        active: true,
+        userMembership: { id: userMembershipId },
+      },
+      relations: {
+        user: true,
+      },
+    });
+  }
 }

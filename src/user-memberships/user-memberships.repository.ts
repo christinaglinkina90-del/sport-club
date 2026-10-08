@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { LessThanOrEqual, MoreThanOrEqual, Not, Repository } from 'typeorm';
+import { In, LessThanOrEqual, MoreThanOrEqual, Not, Repository } from 'typeorm';
 import { UserMembership } from './user-membership.entity';
 import { MembershipStatus } from './enums/membership-status.enum';
 
@@ -37,6 +37,42 @@ export class UserMembershipsRepository {
 
   async deleteById(id: number): Promise<void> {
     await this.repository.delete(id);
+  }
+
+  async findAllActiveByUserId(userId: number): Promise<UserMembership[]> {
+    return this.repository.find({
+      where: {
+        active: true,
+        user: { id: userId },
+      },
+      relations: {
+        user: true,
+        membership: true,
+      },
+      order: {
+        startDate: 'DESC',
+      },
+    });
+  }
+
+  // Последний действующий или ожидающий оплаты абонемент пользователя.
+  async findLatestValidByUserId(
+    userId: number,
+  ): Promise<UserMembership | null> {
+    return this.repository.findOne({
+      where: {
+        active: true,
+        user: { id: userId },
+        status: In([
+          MembershipStatus.PENDING,
+          MembershipStatus.ACTIVE,
+          MembershipStatus.PAUSED,
+        ]),
+      },
+      order: {
+        endDate: 'DESC',
+      },
+    });
   }
 
   async isPeriodOverlapExists(
