@@ -30,6 +30,10 @@ export class SchedulesMapper {
     dto.startTime = entity.startTime;
     dto.endTime = entity.endTime;
     dto.capacity = entity.capacity;
+    dto.freePlaces =
+      entity.bookedCount === undefined
+        ? undefined
+        : Math.max(entity.capacity - entity.bookedCount, 0);
     return dto;
   }
 

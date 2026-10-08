@@ -23,4 +23,7 @@ export class ScheduleDto {
 
   @ApiProperty()
   capacity: number;
+
+  @ApiProperty({ required: false })
+  freePlaces?: number;
 }

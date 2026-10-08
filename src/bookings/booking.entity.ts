@@ -20,7 +20,11 @@ export class Booking {
   })
   user: User;
 
-  @ManyToOne((): typeof Schedule => Schedule, { nullable: false })
+  @ManyToOne(
+    (): typeof Schedule => Schedule,
+    (schedule: Schedule): Booking[] => schedule.bookings,
+    { nullable: false },
+  )
   @JoinColumn({
     name: 'schedule_id',
   })
