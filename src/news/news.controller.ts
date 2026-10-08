@@ -15,7 +15,7 @@ import { ApiOkResponse } from '@nestjs/swagger';
 import { NewsDto } from './dto/news.dto';
 import { NewsSaveDto } from './dto/news.save-dto';
 import { NewsUpdateDto } from './dto/news.update-dto';
-import { Roles } from '../auth/types/auth.decorators';
+import { Public, Roles } from '../auth/types/auth.decorators';
 import { Role } from '../users/enums/role.enum';
 
 @Controller('news')
@@ -32,7 +32,7 @@ export class NewsController {
     return this.service.create(saveDto);
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
+  @Public()
   @Get()
   @ApiOkResponse({
     type: NewsDto,
@@ -42,7 +42,7 @@ export class NewsController {
     return this.service.getAllActiveNews();
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
+  @Public()
   @Get(':id')
   @ApiOkResponse({
     type: NewsDto,

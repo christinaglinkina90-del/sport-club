@@ -15,7 +15,7 @@ import { ApiOkResponse } from '@nestjs/swagger';
 import { ServiceDto } from './dto/service.dto';
 import { ServiceSaveDto } from './dto/service.save-dto';
 import { ServiceUpdateDto } from './dto/service.update-dto';
-import { Roles } from '../auth/types/auth.decorators';
+import { Public, Roles } from '../auth/types/auth.decorators';
 import { Role } from '../users/enums/role.enum';
 
 @Controller('services')
@@ -32,7 +32,7 @@ export class ServicesController {
     return this.service.create(saveDto);
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
+  @Public()
   @Get()
   @ApiOkResponse({
     type: ServiceDto,
@@ -42,7 +42,7 @@ export class ServicesController {
     return this.service.getAllActiveServices();
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
+  @Public()
   @Get(':id')
   @ApiOkResponse({
     type: ServiceDto,

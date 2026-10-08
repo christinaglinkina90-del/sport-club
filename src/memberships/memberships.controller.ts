@@ -15,7 +15,7 @@ import { ApiOkResponse } from '@nestjs/swagger';
 import { MembershipDto } from './dto/membership.dto';
 import { MembershipSaveDto } from './dto/membership.save-dto';
 import { MembershipUpdateDto } from './dto/membership.update-dto';
-import { Roles } from '../auth/types/auth.decorators';
+import { Public, Roles } from '../auth/types/auth.decorators';
 import { Role } from '../users/enums/role.enum';
 
 @Controller('memberships')
@@ -32,7 +32,7 @@ export class MembershipsController {
     return this.service.create(saveDto);
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
+  @Public()
   @Get()
   @ApiOkResponse({
     type: MembershipDto,
@@ -42,7 +42,7 @@ export class MembershipsController {
     return this.service.getAllActiveMemberships();
   }
 
-  @Roles(Role.ADMIN, Role.TRAINER, Role.CLIENT)
+  @Public()
   @Get(':id')
   @ApiOkResponse({
     type: MembershipDto,
