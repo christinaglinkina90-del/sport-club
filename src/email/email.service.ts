@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { User } from '../users/user.entity';
 import { MailerService } from '@nestjs-modules/mailer';
 import { ConfirmationCodesService } from '../confirmation-codes/confirmation-codes.service';
@@ -6,6 +6,8 @@ import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class EmailService {
+  private readonly logger: Logger = new Logger(EmailService.name);
+
   constructor(
     private readonly mailerService: MailerService,
     private readonly confirmationCodesService: ConfirmationCodesService,
@@ -18,11 +20,32 @@ export class EmailService {
 
     const link: string = this.buildConfirmationLink(codeValue);
 
-    await this.mailerService.sendMail({
-      to: user.email,
-      subject: 'Confirm your registration',
-      text: `To confirm your registration click the link - ${link}`,
-    });
+    try {
+      await this.mailerService.sendMail({
+        to: user.email,
+        subject: 'Confirm your registration',
+        text: `To confirm your registration click the link - ${link}`,
+      });
+    } catch (error) {
+      // Локально почтового сервера обычно нет. Чтобы регистрацию можно было
+      // проверить, в режиме разработки не роняем запрос, а пишем ссылку в лог.
+      // В остальных режимах ссылку в лог писать нельзя: по ней можно
+      // подтвердить чужой аккаунт.
+      if (!this.isDevelopment()) {
+        throw error;
+      }
+
+      const reason: string =
+        error instanceof Error ? error.message : 'unknown error';
+      this.logger.warn(
+        `Confirmation email to ${user.email} was not sent (${reason}). ` +
+          `Development mode, confirmation link: ${link}`,
+      );
+    }
+  }
+
+  private isDevelopment(): boolean {
+    return this.configService.get<string>('NODE_ENV') === 'development';
   }
 
   // FRONTEND_URL - адрес фронтенда, например http://localhost:5173.
