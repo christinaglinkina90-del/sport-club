@@ -1,6 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { QdrantPoint } from './types/search/qdrant-point';
-import axios from 'axios';
+import axios, { AxiosInstance } from 'axios';
 import { ConfigService } from '@nestjs/config';
 import { QdrantResponse } from './types/search/qdrant-response';
 import { QdrantResult } from './types/search/qdrant-result';
@@ -14,6 +14,7 @@ import { QdrantScrollResponse } from './types/scroll/qdrant-scroll-response';
 export class QdrantClient implements OnModuleInit {
   private readonly baseUrl: string;
   private readonly archiveUrl: string;
+  private readonly http: AxiosInstance;
 
   constructor(private readonly configService: ConfigService) {
     const dbUrl: string = this.configService.getOrThrow('QDRANT_URL');
@@ -26,12 +27,18 @@ export class QdrantClient implements OnModuleInit {
       'ARCHIVE_DB_COLLECTION_NAME',
     );
     this.archiveUrl = `${dbUrl}/collections/${archiveCollectionName}`;
+
+    // Локальный Qdrant работает без ключа, серверный требует заголовок api-key.
+    const apiKey: string | undefined = this.configService.get('QDRANT_API_KEY');
+    this.http = axios.create({
+      headers: apiKey ? { 'api-key': apiKey } : {},
+    });
   }
 
   async onModuleInit(): Promise<void> {
     for (const url of [this.baseUrl, this.archiveUrl]) {
       try {
-        await axios.put(url, {
+        await this.http.put(url, {
           vectors: {
             size: 1536,
             distance: 'Cosine',
@@ -46,7 +53,7 @@ export class QdrantClient implements OnModuleInit {
   async save(points: QdrantPoint[], toArchive?: boolean): Promise<void> {
     const url: string = toArchive ? this.archiveUrl : this.baseUrl;
 
-    await axios.put(`${url}/points`, {
+    await this.http.put(`${url}/points`, {
       points: points,
     });
   }
@@ -56,7 +63,7 @@ export class QdrantClient implements OnModuleInit {
     serviceType: string,
     onlyPublicDocs: boolean,
   ): Promise<QdrantResult[]> {
-    const response: QdrantResponse = await axios.post(
+    const response: QdrantResponse = await this.http.post(
       `${this.baseUrl}/points/search`,
       {
         vector: embedding,
@@ -115,7 +122,7 @@ export class QdrantClient implements OnModuleInit {
     let offset: string | null = null;
 
     do {
-      const response: QdrantScrollResponse = await axios.post(
+      const response: QdrantScrollResponse = await this.http.post(
         `${this.baseUrl}/points/scroll`,
         {
           with_payload: true,
@@ -149,6 +156,6 @@ export class QdrantClient implements OnModuleInit {
   async deletePointsByDocumentId(documentId: string): Promise<void> {
     const filter: SearchFilterAnd = this.createScrollFilter(documentId);
 
-    await axios.post(`${this.baseUrl}/points/delete`, { filter: filter });
+    await this.http.post(`${this.baseUrl}/points/delete`, { filter: filter });
   }
 }

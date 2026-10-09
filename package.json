@@ -20,7 +20,8 @@
     "test:debug": "vitest --inspect-brk --no-file-parallelism",
     "test:e2e": "vitest run --config ./vitest.config.e2e.ts",
     "test:integration": "vitest run --config ./vitest.config.integration.ts",
-    "seed:demo": "node --env-file=scripts/seed-demo.env scripts/seed-demo.mjs"
+    "seed:demo": "node --env-file=scripts/seed-demo.env scripts/seed-demo.mjs",
+    "ingest:club-info": "node --env-file=scripts/seed-demo.env scripts/ingest-knowledge.mjs docs/knowledge/club-info.ru.txt club-info general 1 ru"
   },
   "dependencies": {
     "@nestjs-modules/mailer": "^3.0.2",
